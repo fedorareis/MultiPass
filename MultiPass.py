@@ -17,10 +17,6 @@ app.config.from_object(__name__)
 def connect_db():
     return sqlite3.connect(app.config['DATABASE'])
 
-@app.route("/")
-def hello():
-    return "Welcome to MultiPass"
-
 @app.before_request
 def before_request():
     g.db = connect_db()
@@ -30,6 +26,17 @@ def teardown_request(exception):
     db = getattr(g, 'db', None)
     if db is not None:
         db.close()
+        
+@app.route("/")
+def hello():
+    return render_template('layout.html')
+    
+@app.route("/passwords")
+def display_pass():
+    cur = g.db.execute('SELECT name, hostDomain, pass, type, note FROM pswds WHERE passGroup = ?', '1')
+    pswds = cur.fetchall()
+    return render_template('show_passwords.html', pswds=pswds)
+    #print cur.fetchall()
 
 #@app.route('/')
 #def show_entries():
