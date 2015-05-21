@@ -56,7 +56,8 @@ function shareGKey(pKey, pubKey, gKey){
 }
 
 function generateGKey(){
-	//TODO
+	rand = sjcl.random.randomWords(5, 6)
+	console.log(rand)
 	console.log("GET THIS DONE!!!!!! (generate group key)")
 }
 
