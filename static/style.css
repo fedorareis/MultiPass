@@ -1,0 +1,15 @@
+a {
+	text-decoration: none;
+}
+
+a#Home {
+	color: #00997A;
+}
+
+h1 {
+	text-align: center;
+}
+
+#login {
+	float: right;
+}
