@@ -56,8 +56,16 @@ function shareGKey(pKey, pubKey, gKey){
 }
 
 function generateGKey(){
-	rand = sjcl.random.randomWords(5, 6)
+	rand = sjcl.random.randomWords(8, 6)
 	console.log(rand)
-	console.log("GET THIS DONE!!!!!! (generate group key)")
+	//console.log("GET THIS DONE!!!!!! (generate group key)")
+	return rand
 }
 
+function testGEcrypt(){
+	rand = generateGKey()
+	cypher = securePass(rand, "password")
+	console.log(cypher)
+	plain = getPass(rand, cypher)
+	console.log(plain)
+}

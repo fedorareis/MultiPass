@@ -1,12 +1,19 @@
-function sendData(data) {
+function testClick() {
+      alert("the button was clicked")
+      sendData([document.forms["Form"].elements["account"].value], 'login')
+}
+
+var el = document.getElementById("Magic");
+el.addEventListener("click", testClick, false);
+
+function sendData(data, page) {
   var XHR = new XMLHttpRequest();
   var urlEncodedData = "";
   var urlEncodedDataPairs = [];
-  var name;
 
   // We turn the data object into an array of URL encoded key value pairs.
   for(name in data) {
-    urlEncodedDataPairs.push(encodeURIComponent(name) + '=' + encodeURIComponent(data[name]));
+    urlEncodedDataPairs.push(encodeURIComponent(name) + '=' + encodeURIComponent(data));
   }
 
   // We combine the pairs into a single string and replace all encoded spaces to 
@@ -24,7 +31,7 @@ function sendData(data) {
   });
 
   // We setup our request
-  XHR.open('POST', 'http://127.0.0.1:5000/add');
+  XHR.open('POST', 'http://127.0.0.1:5000/' + page);
 
   // We add the required HTTP header to handle a form data POST request
   XHR.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');

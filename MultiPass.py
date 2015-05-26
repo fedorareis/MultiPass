@@ -28,8 +28,8 @@ def teardown_request(exception):
         db.close()
         
 @app.route("/")
-def hello():
-    return render_template('layout.html')
+def home():
+    return render_template('home.html')
     
 @app.route("/passwords")
 def display_pass():
@@ -53,14 +53,17 @@ def add_entry():
 def login():
     error = None
     if request.method == 'POST':
-        if request.form['username'] != app.config['USERNAME']:
-            error = 'Invalid username'
-        elif request.form['password'] != app.config['PASSWORD']:
-            error = 'Invalid password'
-        else:
-            session['logged_in'] = True
-            flash('You were logged in')
-            return redirect(url_for('display_pass'))
+        cur = g.db.execute('SELECT pass FROM login WHERE name = ?', [request.form['0']])
+        pswd = cur.fetchone()
+        if(pswd != None):
+            if request.form['username'] != app.config['USERNAME']:
+                error = 'Invalid username'
+            elif request.form['password'] != app.config['PASSWORD']:
+                error = 'Invalid password'
+            else:
+                session['logged_in'] = True
+                flash('You were logged in')
+                return redirect(url_for('display_pass'))
     return render_template('login.html', error=error)
 
 @app.route('/logout')
@@ -68,6 +71,14 @@ def logout():
     session.pop('logged_in', None)
     flash('You were logged out')
     return redirect(url_for('display_pass'))
+    
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    error = None
+    if request.method == 'POST':
+        sessions['logged_in'] = True
+        return redirect(url_for('display_pass'))
+    return app.send_static_file('register.html')
     
 if __name__ == '__main__':
     app.run()
