@@ -1,11 +1,3 @@
-function testClick() {
-      alert("the button was clicked")
-      sendData([document.forms["Form"].elements["account"].value], 'login')
-}
-
-var el = document.getElementById("Magic");
-el.addEventListener("click", testClick, false);
-
 function sendData(data, page) {
   var XHR = new XMLHttpRequest();
   var urlEncodedData = "";

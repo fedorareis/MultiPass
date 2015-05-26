@@ -1,13 +1,15 @@
 <!doctype html>
 <title>Multipass</title>
-<!--<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}"></link>-->
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}"></link>
+<script type="text/javascript" src="{{ url_for('static', filename='transfer.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='keyGeneration.js')}}"></script>
 <div class=page>
-   <a href="{{ url_for('home') }}"><h1>Multipass</h1></a></a>
+   <h1><a href="{{ url_for('home') }}" id="Home">Multipass</a></h1>
    <div class=metanav>
    {% if not session.logged_in %}
-      <a href="{{ url_for('login') }}">log in</a>
+      <a href="{{ url_for('login') }}" id="login">log in</a>
    {% else %}
-      <a href="{{ url_for('logout') }}">log out</a>
+      <a href="{{ url_for('logout') }}" id="login">log out</a>
    {% endif %}
    </div>
    {% for message in get_flashed_messages() %}
@@ -15,4 +17,3 @@
    {% endfor %}
    {% block body %}{% endblock %}
 </div>
-<script type="text/javascript" src="{{ url_for('static', filename='transfer.js') }}"></script>
