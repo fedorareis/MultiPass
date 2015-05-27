@@ -1,0 +1,22 @@
+<!doctype html>
+<h2>Register</h2>
+{% if error %}<p class=error><strong>Error:</strong></p> {{ error }}{% endif %}
+<form action="{{ url_for('register') }}" method=post id="Form">
+	<dl>
+		<dt>First Name:
+        <dd><input type=text name=first_name>
+		<dt>Last Name:
+        <dd><input type=text name=last_name>
+		<dt>email:
+		<dd><input type=text name=email>
+        <dt>Password:
+        <dd><input type=password name=password>
+		<dt>Verify Password:
+		<dd><input type=password name=verify>
+	</dl>
+	<button  type="button" id="register">Register</button>
+</form>
+<script type="text/javascript" src="{{ url_for('static', filename='sjcl.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='keyGeneration.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='transfer.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='register.js') }}"></script>

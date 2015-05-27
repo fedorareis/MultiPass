@@ -1,4 +1,4 @@
-function generateKeyPair(){
+function generateKeyPair(password){
 	//Generates keys
 	var key = sjcl.ecc.elGamal.generateKeys(256)
 	var privateKey = key.sec.get()
@@ -7,9 +7,11 @@ function generateKeyPair(){
 	// Converts keys to Base64 for storage
 	var serialPubKey = sjcl.codec.base64.fromBits(publicKey.x.concat(publicKey.y))
 	var serialPrivateKey = sjcl.codec.base64.fromBits(privateKey)
-	privateKey = securePKey("password", serialPrivateKey)
+	var rand = sjcl.random.randomWords(3, 10);
+	var PBK = sjcl.misc.pbkdf2(password, rand, 5000)
+	privateKey = securePKey(PBK, serialPrivateKey)
 
-	return [privateKey, serialPubKey]
+	return [privateKey, serialPubKey, rand]
 }
 
 function securePKey(password, pKey){
@@ -55,11 +57,9 @@ function shareGKey(pKey, pubKey, gKey){
 	return secureGKey(pubKey, dcGKey)
 }
 
-function generateGKey(){
-	rand = sjcl.random.randomWords(8, 6)
-	console.log(rand)
-	//console.log("GET THIS DONE!!!!!! (generate group key)")
-	return rand
+function generateGKey(pubKey){
+	var rand = sjcl.random.randomWords(8, 10)
+	return secureGKey(pubKey, rand)
 }
 
 function testGEcrypt(){

@@ -1,7 +1,6 @@
 # all the imports
 import sqlite3
-from flask import Flask, request, session, g, redirect, url_for, \
-     abort, render_template, flash
+from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, jsonify
 
 # configuration
 DATABASE = 'user.db'
@@ -53,32 +52,69 @@ def add_entry():
 def login():
     error = None
     if request.method == 'POST':
-        cur = g.db.execute('SELECT pass FROM login WHERE name = ?', [request.form['0']])
+        cur = g.db.execute('SELECT pass FROM login WHERE email = ?', [request.form['username']])
         pswd = cur.fetchone()
         if(pswd != None):
-            if request.form['username'] != app.config['USERNAME']:
-                error = 'Invalid username'
-            elif request.form['password'] != app.config['PASSWORD']:
-                error = 'Invalid password'
+            if request.form['password'] != pswd[0]:
+                error = {'error': 'Invalid password'}
             else:
                 session['logged_in'] = True
                 flash('You were logged in')
-                return redirect(url_for('display_pass'))
+                print "logged in"
+                return url_for('display_pass')
+        else:
+            error = {'error': 'Invalid username'}
+        print error
+        return jsonify(error)
+    return render_template('login.html', error=error)
+
+@app.route('/login/get', methods=['POST'])
+def get_salt():
+    error = None
+    if request.method == 'POST':
+        cur = g.db.execute('SELECT salt FROM login WHERE email = ?', [request.form['username']])
+        pswd = cur.fetchone()
+        if(pswd != None):
+            return pswd[0]
+        else:
+            error = {'error': 'Invalid username'}
+            return jsonify(error)
     return render_template('login.html', error=error)
 
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
     flash('You were logged out')
-    return redirect(url_for('display_pass'))
+    return redirect(url_for('home'))
     
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     error = None
     if request.method == 'POST':
-        sessions['logged_in'] = True
-        return redirect(url_for('display_pass'))
-    return app.send_static_file('register.html')
+        cur = g.db.execute('SELECT * FROM login WHERE email = ?', [request.form["email"]])
+        check = cur.fetchone()
+        if(check != None):
+            error = {'error': 'There is already a registered user with that email.'}
+            return jsonify(error)
+        else:
+            g.db.execute('INSERT INTO login VALUES (?, ?, ?, ?, ?)',
+                         [request.form["first_name"], request.form["last_name"], request.form["email"], request.form["password"], request.form["salt"]])
+            cur = g.db.execute('SELECT MAX(passGroup) FROM users')
+            num = cur.fetchone()
+            num = num[0]
+            if(num == None):
+                num = 0
+            else:
+                num += 1
+            g.db.execute('INSERT INTO users VALUES (?, ?, ?, ?, ?, ?)',
+                         [request.form["email"], request.form["pKey"],
+                         request.form["pubKey"], num, request.form["gKey"],
+                         request.form["kSalt"]])
+            g.db.commit()
+            session['logged_in'] = True
+            flash('You were logged in')
+            return url_for('display_pass')
+    return render_template('home.html', error=error)
     
 if __name__ == '__main__':
     app.run()

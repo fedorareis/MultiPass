@@ -5,7 +5,7 @@ function sendData(data, page) {
 
   // We turn the data object into an array of URL encoded key value pairs.
   for(name in data) {
-    urlEncodedDataPairs.push(encodeURIComponent(name) + '=' + encodeURIComponent(data));
+    urlEncodedDataPairs.push(encodeURIComponent(name) + '=' + encodeURIComponent(data[name]));
   }
 
   // We combine the pairs into a single string and replace all encoded spaces to 
@@ -14,13 +14,26 @@ function sendData(data, page) {
 
   // We define what will happen if the data is successfully sent
   XHR.addEventListener('load', function(event) {
-    alert('Yeah! Data sent and response loaded.');
+    console.log('Yeah! Data sent and response loaded.');
   });
 
   // We define what will happen in case of error
   XHR.addEventListener('error', function(event) {
-    alert('Oups! Something goes wrong.');
+    console.log('Oups! Something goes wrong.');
   });
+  
+  XHR.onreadystatechange = function() {//Call a function when the state changes.
+    if(XHR.readyState == 4 && XHR.status == 200) {
+        //alert(XHR.responseText)
+        //alert(XHR.response["error"])
+        try {
+          document.getElementById("error").style.display = "inline"
+          document.getElementById("error_msg").textContent = "Error: " + JSON.parse(XHR.responseText)["error"]
+        } catch (error) {
+          window.location.href = 'http://127.0.0.1:5000' + XHR.responseText;
+        }
+    }
+  }
 
   // We setup our request
   XHR.open('POST', 'http://127.0.0.1:5000/' + page);
