@@ -1,17 +1,34 @@
 {% extends "layout.html" %}
 {% block body %}
-   <h2>Login</h2>
-   <h1 style="color:red"> I can't validate users yet</h1>
-   <p id="error" style="display: none;"><strong id="error_msg"></strong></p>
-   <form action="{{ url_for('login') }}" method=post id="Form">
+   <form action="{{ url_for('share') }}" method=post id="Form">
       <dl>
-         <dt>Username:
-         <dd><input type=text name=username>
-         <dt>Password:
-         <dd><input type=password name=password>
+         <dt>User to share with:</dt>
+         <dd>
+            <select name=username>
+   			 	{% for user in users %}
+                  {% for username in user %}
+   			 		   <option value="{{username}}">{{username}}</option>
+                  {% endfor %}
+   				{% endfor %}
+		 	  </select>
+         </dd>
+         <dt>Password Group to share:</dt>
+         <dd>
+            <select name=group>
+   			 	{% for group in groups %}
+                  {% for name in group %}
+   			 		   <option value="{{name}}">{{name}}</option>
+                  {% endfor %}
+   				{% endfor %}
+            </select>
+         </dd>
+         <dt>Password:</dt>
+         <dd>
+            <input type="password" name="password">
+         </dd>
       </dl>
    </form>
-   <button id="submit">submit</button>
+   <button id="share">share</button>
    
-<script type="text/javascript" src="{{ url_for('static', filename='login.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='share.js') }}"></script>
 {% endblock %}

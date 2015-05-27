@@ -44,7 +44,6 @@ def add_entry():
     #g.db.execute('insert into entries (title, text) values (?, ?)',
     #             [request.form['title'], request.form['text']])
     #g.db.commit()
-    print request.form 
     flash('New entry was successfully posted')
     return redirect(url_for('display_pass'))
 
@@ -59,8 +58,8 @@ def login():
                 error = {'error': 'Invalid password'}
             else:
                 session['logged_in'] = True
+                session['username'] = request.form["username"]
                 flash('You were logged in')
-                print "logged in"
                 return url_for('display_pass')
         else:
             error = {'error': 'Invalid username'}
@@ -84,8 +83,20 @@ def get_salt():
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
+    session.pop('username', None)
     flash('You were logged out')
     return redirect(url_for('home'))
+    
+@app.route('/share')
+def share():
+    cur = g.db.execute('SELECT email FROM login WHERE NOT (email = ?)', [session['username']])
+    users = cur.fetchall()
+    cur = g.db.execute('SELECT passGroup FROM users WHERE name = ?', [session['username']])
+    groups = cur.fetchall()
+    cur = g.db.execute('SELECT salt FROM users WHERE name = ?', [session['username']])
+    salt = cur.fetchone()
+    print salt
+    return render_template('share.html', users=users, groups=groups, salt=salt)
     
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -112,6 +123,7 @@ def register():
                          request.form["kSalt"]])
             g.db.commit()
             session['logged_in'] = True
+            session['username'] = request.form["email"]
             flash('You were logged in')
             return url_for('display_pass')
     return render_template('home.html', error=error)
