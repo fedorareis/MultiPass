@@ -1,5 +1,6 @@
 # all the imports
 import sqlite3
+import json
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, jsonify
 
 # configuration
@@ -32,8 +33,17 @@ def home():
     
 @app.route("/passwords")
 def display_pass():
-    cur = g.db.execute('SELECT name, hostDomain, pass, type, note FROM pswds WHERE passGroup = ?', '1')
-    pswds = cur.fetchall()
+    print "in function"
+    cur = g.db.execute('SELECT passGroup FROM users WHERE name = ?',
+                       [session['username']])
+    print "fetching"
+    groups = cur.fetchall()
+    pswds = []
+    for group in groups:
+        cur = g.db.execute('SELECT name, hostDomain, pass, type, note, passGroup FROM pswds WHERE passGroup = ?',
+                           [group[0]])
+        pswds += cur.fetchall()
+    print pswds
     return render_template('show_passwords.html', pswds=pswds)
     #print cur.fetchall()
 
@@ -51,7 +61,8 @@ def add_entry():
 def login():
     error = None
     if request.method == 'POST':
-        cur = g.db.execute('SELECT pass FROM login WHERE email = ?', [request.form['username']])
+        cur = g.db.execute('SELECT pass FROM login WHERE email = ?',
+                           [request.form['username']])
         pswd = cur.fetchone()
         if(pswd != None):
             if request.form['password'] != pswd[0]:
@@ -71,7 +82,8 @@ def login():
 def get_salt():
     error = None
     if request.method == 'POST':
-        cur = g.db.execute('SELECT salt FROM login WHERE email = ?', [request.form['username']])
+        cur = g.db.execute('SELECT salt FROM login WHERE email = ?',
+                           [request.form['username']])
         pswd = cur.fetchone()
         if(pswd != None):
             return pswd[0]
@@ -89,27 +101,56 @@ def logout():
     
 @app.route('/share')
 def share():
-    cur = g.db.execute('SELECT email FROM login WHERE NOT (email = ?)', [session['username']])
-    users = cur.fetchall()
-    cur = g.db.execute('SELECT passGroup FROM users WHERE name = ?', [session['username']])
-    groups = cur.fetchall()
-    cur = g.db.execute('SELECT salt FROM users WHERE name = ?', [session['username']])
-    salt = cur.fetchone()
-    print salt
-    return render_template('share.html', users=users, groups=groups, salt=salt)
+    if request.method == 'POST':
+        print "getting groups"
+        cur = g.db.execute('SELECT passGroup FROM users WHERE name = ?',
+                           [request.form["username"]])
+        groups = cur.fetchone()
+        print groups
+        cur = g.db.execute('SELECT pvKey, pubKey, salt FROM users WHERE passGroup = ?',
+                           [groups[0][0]])
+        data = cur.fetchone()
+        print "POST"
+    else:
+        cur = g.db.execute('SELECT email FROM login WHERE NOT (email = ?)',
+                           [session['username']])
+        users = cur.fetchall()
+        cur = g.db.execute('SELECT passGroup FROM users WHERE name = ?',
+                           [session['username']])
+        groups = cur.fetchall()
+        cur = g.db.execute('SELECT salt FROM users WHERE name = ?',
+                           [session['username']])
+        salt = cur.fetchone()
+        return render_template('share.html', users=users, groups=groups, salt=json.dumps(salt[0]))
+
+@app.route('/share/get', methods=['POST'])
+def transfer():
+    if request.method == 'POST':
+        cur = g.db.execute('SELECT gKey, pvKey FROM users WHERE name = ? AND passGroup = ?',
+                           [session['username'], request.form["group"]])
+        data = cur.fetchone()
+        cur = g.db.execute('SELECT pubKey FROM users WHERE name = ?',
+                           [request.form["username"]])
+        data += cur.fetchone()
+        return json.dumps(data)
+    return jsonify(None)
+        
     
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     error = None
     if request.method == 'POST':
-        cur = g.db.execute('SELECT * FROM login WHERE email = ?', [request.form["email"]])
+        cur = g.db.execute('SELECT * FROM login WHERE email = ?',
+                           [request.form["email"]])
         check = cur.fetchone()
         if(check != None):
             error = {'error': 'There is already a registered user with that email.'}
             return jsonify(error)
         else:
             g.db.execute('INSERT INTO login VALUES (?, ?, ?, ?, ?)',
-                         [request.form["first_name"], request.form["last_name"], request.form["email"], request.form["password"], request.form["salt"]])
+                         [request.form["first_name"], request.form["last_name"],
+                         request.form["email"], request.form["password"],
+                         request.form["salt"]])
             cur = g.db.execute('SELECT MAX(passGroup) FROM users')
             num = cur.fetchone()
             num = num[0]

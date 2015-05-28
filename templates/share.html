@@ -31,4 +31,7 @@
    <button id="share">share</button>
    
 <script type="text/javascript" src="{{ url_for('static', filename='share.js') }}"></script>
+<script type="text/javascript">
+        setSalt({{salt|safe}});
+</script>
 {% endblock %}
