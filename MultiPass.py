@@ -33,26 +33,57 @@ def home():
     
 @app.route("/passwords")
 def display_pass():
+    if not session.get('logged_in'):
+        return redirect(url_for('home'))
     cur = g.db.execute('SELECT passGroup FROM users WHERE name = ?',
                        [session['username']])
     groups = cur.fetchall()
+    cur = g.db.execute('SELECT name FROM type')
+    types = cur.fetchall()
+    pTypes = []
+    for pType in types:
+        pTypes += [pType[0]]
     pswds = []
     for group in groups:
         cur = g.db.execute('SELECT name, hostDomain, pass, type, note, passGroup FROM pswds WHERE passGroup = ?',
                            [group[0]])
-        pswds += cur.fetchall()
+        temp = cur.fetchall()
+        print temp
+        length = len(temp)
+        edit = map(list, temp)
+        while length > 0:
+            length -= 1
+            edit[length][3] = pTypes[edit[length][3]]
+        temp = tuple(tuple(i) for i in edit)
+        pswds += temp
     return render_template('show_passwords.html', pswds=pswds)
-    #print cur.fetchall()
 
-@app.route('/add', methods=['POST'])
-def add_entry():
+@app.route('/add', methods=['GET', 'POST'])
+def add_pass():
     if not session.get('logged_in'):
-        abort(401)
-    #g.db.execute('insert into entries (title, text) values (?, ?)',
-    #             [request.form['title'], request.form['text']])
-    #g.db.commit()
-    flash('New entry was successfully posted')
-    return redirect(url_for('display_pass'))
+        return redirect(url_for('home'))
+    if request.method == 'POST':
+        print "POST"
+    else:
+        cur = g.db.execute('SELECT name FROM type')
+        types = cur.fetchall()
+        cur = g.db.execute('SELECT passGroup FROM users WHERE name = ?',
+                               [session['username']])
+        groups = cur.fetchall()
+        cur = g.db.execute('SELECT salt FROM users WHERE name = ?',
+                           [session['username']])
+        salt = cur.fetchone()
+        flash('New entry was successfully posted')
+    	return render_template('add.html', types=types, groups=groups, salt=json.dumps(salt[0]))
+
+@app.route('/add/get', methods=['POST'])
+def get_user():
+    if not session.get('logged_in'):
+        return redirect(url_for('home'))
+    cur = g.db.execute('SELECT * FROM users WHERE name = ? AND passGroup = ?',
+                       [session['username'], request.form['group']])
+    data = cur.fetchone()
+    return json.dumps(data)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -97,23 +128,20 @@ def logout():
     
 @app.route('/share', methods=['GET', 'POST'])
 def share():
+    if not session.get('logged_in'):
+        return redirect(url_for('home'))
     if request.method == 'POST':
-        print "getting groups"
         cur = g.db.execute('SELECT passGroup FROM users WHERE name = ?',
                            [request.form["username"]])
         groups = cur.fetchone()
-        print groups[0]
         cur = g.db.execute('SELECT pvKey, pubKey, salt FROM users WHERE passGroup = ?',
                            [groups[0]])
         data = cur.fetchone()
-        print data
-        print data[0]
         g.db.execute('INSERT INTO users VALUES (?, ?, ?, ?, ?, ?)',
                      [request.form["username"], data[0], data[1],
                       request.form["group"], request.form["GKey"],
                       data[2]])
         g.db.commit()
-        print "POST"
         return url_for('display_pass')
     else:
         cur = g.db.execute('SELECT email FROM login WHERE NOT (email = ?)',
@@ -129,6 +157,8 @@ def share():
 
 @app.route('/share/get', methods=['POST'])
 def transfer():
+    if not session.get('logged_in'):
+        return redirect(url_for('home'))
     if request.method == 'POST':
         cur = g.db.execute('SELECT gKey, pvKey FROM users WHERE name = ? AND passGroup = ?',
                            [session['username'], request.form["group"]])

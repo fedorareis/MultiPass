@@ -13,3 +13,8 @@ h1 {
 #login {
 	float: right;
 }
+
+table {
+	width: 100%;
+	text-align: center;
+}

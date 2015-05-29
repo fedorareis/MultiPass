@@ -1,31 +1,18 @@
-var salt
-
-function setSalt(data){
-  temp = []
-  salt = data.split(',')
-  salt.forEach(function(element) {
-    temp.push(parseInt(element))
-  }, this);
-  salt = temp
-}
-
-function share() {
-  if (document.forms["Form"].elements["password"].value != ""){
+function get() {
+  if (document.forms["Form"].elements["name"].value != "" &&
+      document.forms["Form"].elements["password"].value != ""){
       var data = {};
-      var temp = document.forms["Form"].elements["username"]
-      var username = temp.options[temp.selectedIndex].value
-      temp = document.forms["Form"].elements["group"]
+      var temp = document.forms["Form"].elements["group"]
       var group = temp.options[temp.selectedIndex].value
-      data["username"] = username;
       data["group"] = group;
-      getData(data, 'share/get');
+      getData(data, 'add/get');
   }
 }
 
-var el = document.getElementById("share");
-el.addEventListener("click", share, false);
+var el = document.getElementById("add");
+el.addEventListener("click", get, false);
 
-function transfer(keys) {
+function add(keys) {
   var data = {}
   var temp = document.forms["Form"].elements["username"]
   var username = temp.options[temp.selectedIndex].value
@@ -39,7 +26,7 @@ function transfer(keys) {
   var PBK = sjcl.misc.pbkdf2(document.forms["Form"].elements["password"].value, salt, 5000)
   var PKey = getPKey(PBK, keys[1])
   data["GKey"] = shareGKey(PKey, keys[2], keys[0])
-  sendData(data, 'share')
+  sendData(data, 'add')
 }
 
 function getData(data, page) {
@@ -71,16 +58,7 @@ function getData(data, page) {
         //alert(XHR.responseText)
         //alert(XHR.response["error"])
         try {
-          var temp = JSON.parse(XHR.responseText)
-          var keys = []
-          /* 0 = Group Key
-             1 = Private Key
-             2 = Public Key */
-          keys.push(temp[0])
-          keys.push(temp[1])
-          keys.push(temp[2])
-          test = keys
-          transfer(keys)
+          add(JSON.parse(XHR.responseText))
         } catch (error) {
           console.log(error)
         }
