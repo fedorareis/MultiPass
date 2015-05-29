@@ -33,17 +33,14 @@ def home():
     
 @app.route("/passwords")
 def display_pass():
-    print "in function"
     cur = g.db.execute('SELECT passGroup FROM users WHERE name = ?',
                        [session['username']])
-    print "fetching"
     groups = cur.fetchall()
     pswds = []
     for group in groups:
         cur = g.db.execute('SELECT name, hostDomain, pass, type, note, passGroup FROM pswds WHERE passGroup = ?',
                            [group[0]])
         pswds += cur.fetchall()
-    print pswds
     return render_template('show_passwords.html', pswds=pswds)
     #print cur.fetchall()
 
@@ -74,7 +71,6 @@ def login():
                 return url_for('display_pass')
         else:
             error = {'error': 'Invalid username'}
-        print error
         return jsonify(error)
     return render_template('login.html', error=error)
 
@@ -99,18 +95,26 @@ def logout():
     flash('You were logged out')
     return redirect(url_for('home'))
     
-@app.route('/share')
+@app.route('/share', methods=['GET', 'POST'])
 def share():
     if request.method == 'POST':
         print "getting groups"
         cur = g.db.execute('SELECT passGroup FROM users WHERE name = ?',
                            [request.form["username"]])
         groups = cur.fetchone()
-        print groups
+        print groups[0]
         cur = g.db.execute('SELECT pvKey, pubKey, salt FROM users WHERE passGroup = ?',
-                           [groups[0][0]])
+                           [groups[0]])
         data = cur.fetchone()
+        print data
+        print data[0]
+        g.db.execute('INSERT INTO users VALUES (?, ?, ?, ?, ?, ?)',
+                     [request.form["username"], data[0], data[1],
+                      request.form["group"], request.form["GKey"],
+                      data[2]])
+        g.db.commit()
         print "POST"
+        return url_for('display_pass')
     else:
         cur = g.db.execute('SELECT email FROM login WHERE NOT (email = ?)',
                            [session['username']])

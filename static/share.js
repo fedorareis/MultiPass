@@ -25,18 +25,22 @@ function share() {
 
 var el = document.getElementById("share");
 el.addEventListener("click", share, false);
-var test
+
 function transfer(keys) {
-  var data = {};
+  var data = {}
   var temp = document.forms["Form"].elements["username"]
   var username = temp.options[temp.selectedIndex].value
-  data["username"] = username;
+  temp = document.forms["Form"].elements["group"]
+  var group = temp.options[temp.selectedIndex].value
+  data["username"] = username
+  data["group"] = group
   console.log(keys)
   /* 0 = Group Key
      1 = Private Key
      2 = Public Key */
   var PBK = sjcl.misc.pbkdf2(document.forms["Form"].elements["password"].value, salt, 5000)
-  data["GKey"] = secureGKey(keys[2], getGKey(getPKey(PBK, keys[1]), keys[0]))
+  var PKey = getPKey(PBK, keys[1])
+  data["GKey"] = shareGKey(PKey, keys[2], keys[0])
   console.log("transfering")
   sendData(data, 'share')
 }
@@ -75,15 +79,15 @@ function getData(data, page) {
           /* 0 = Group Key
              1 = Private Key
              2 = Public Key */
-          keys.push(JSON.parse(temp[0]))
-          keys.push(JSON.parse(temp[1]))
+          keys.push(temp[0])
+          keys.push(temp[1])
           keys.push(temp[2])
           console.log(keys)
           console.log("call transfer")
           test = keys
           transfer(keys)
         } catch (error) {
-          console.log("FAILED!!")
+          console.log(error)
         }
     }
   }

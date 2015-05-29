@@ -9,6 +9,7 @@ function generateKeyPair(password){
 	var serialPrivateKey = sjcl.codec.base64.fromBits(privateKey)
 	var rand = sjcl.random.randomWords(3, 10);
 	var PBK = sjcl.misc.pbkdf2(password, rand, 5000)
+	console.log(serialPrivateKey)
 	privateKey = securePKey(PBK, serialPrivateKey)
 
 	return [privateKey, serialPubKey, rand]
@@ -58,14 +59,27 @@ function shareGKey(pKey, pubKey, gKey){
 }
 
 function generateGKey(pubKey){
-	var rand = sjcl.random.randomWords(8, 10)
+	var rand = sjcl.codec.base64.fromBits(sjcl.random.randomWords(8, 10))
 	return secureGKey(pubKey, rand)
 }
 
-function testGEcrypt(){
+function testPassEcrypt(){
 	rand = generateGKey()
 	cypher = securePass(rand, "password")
 	console.log(cypher)
 	plain = getPass(rand, cypher)
 	console.log(plain)
+}
+
+function testGEcrypt(){
+	var keys = generateKeyPair("bob")
+	var otherKeys = generateKeyPair("password")
+	var GKey = generateGKey(keys[1])
+	var cypher = secureGKey(keys[1], GKey)
+	data = {};
+	data["keys"] = keys
+	data["otherKeys"] = otherKeys
+	data["GKey"] = GKey
+	data["cypher"] = cypher
+	return data
 }

@@ -1,5 +1,5 @@
-var pair = generateKeyPair()
-var pair2 = generateKeyPair()
+var pair = generateKeyPair("bob")
+var pair2 = generateKeyPair("password")
 var gKey = secureGKey(pair[1], "bob")
 var cyphertext = testEcrypt("password", pair[0], gKey)
 var decrypted = testDcrypt("password", pair[0], gKey, cyphertext)
