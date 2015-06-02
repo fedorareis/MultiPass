@@ -48,7 +48,6 @@ def display_pass():
         cur = g.db.execute('SELECT name, hostDomain, pass, type, note, passGroup FROM pswds WHERE passGroup = ?',
                            [group[0]])
         temp = cur.fetchall()
-        print temp
         length = len(temp)
         edit = map(list, temp)
         while length > 0:
@@ -98,8 +97,11 @@ def login():
             else:
                 session['logged_in'] = True
                 session['username'] = request.form["username"]
-                flash('You were logged in')
-                return url_for('display_pass')
+                print request.form["groups"]
+                #session['group'] = groups
+                #print session['group']
+                #flash('You were logged in')
+                #return url_for('display_pass')
         else:
             error = {'error': 'Invalid username'}
         return jsonify(error)
@@ -111,9 +113,13 @@ def get_salt():
     if request.method == 'POST':
         cur = g.db.execute('SELECT salt FROM login WHERE email = ?',
                            [request.form['username']])
-        pswd = cur.fetchone()
-        if(pswd != None):
-            return pswd[0]
+        salt = cur.fetchone()
+        if(salt != None):
+            cur = g.db.execute('SELECT pvKey, passGroup, gKey, salt FROM users WHERE name = ?',
+                               [request.form['username']])
+            data = cur.fetchall()
+            print {'salt': salt[0], 'data': data}
+            return json.dumps({'salt': salt[0], 'data': data})
         else:
             error = {'error': 'Invalid username'}
             return jsonify(error)
@@ -123,6 +129,7 @@ def get_salt():
 def logout():
     session.pop('logged_in', None)
     session.pop('username', None)
+    #session.pop('group', None)
     flash('You were logged out')
     return redirect(url_for('home'))
     

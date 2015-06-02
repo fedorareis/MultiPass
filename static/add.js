@@ -1,4 +1,4 @@
-function get() {
+function getUser() {
   if (document.forms["Form"].elements["name"].value != "" &&
       document.forms["Form"].elements["password"].value != ""){
       var data = {};
@@ -10,9 +10,9 @@ function get() {
 }
 
 var el = document.getElementById("add");
-el.addEventListener("click", get, false);
+el.addEventListener("click", getUser, false);
 
-function add(keys) {
+function add(user) {
   var data = {}
   var temp = document.forms["Form"].elements["username"]
   var username = temp.options[temp.selectedIndex].value
@@ -20,12 +20,15 @@ function add(keys) {
   var group = temp.options[temp.selectedIndex].value
   data["username"] = username
   data["group"] = group
-  /* 0 = Group Key
+  /* 0 = Name
      1 = Private Key
-     2 = Public Key */
-  var PBK = sjcl.misc.pbkdf2(document.forms["Form"].elements["password"].value, salt, 5000)
-  var PKey = getPKey(PBK, keys[1])
-  data["GKey"] = shareGKey(PKey, keys[2], keys[0])
+     2 = Public Key 
+     3 = Group
+     4 = Group Key
+     5 = Salt */
+  var PBK = sjcl.misc.pbkdf2(document.forms["Form"].elements["password"].value, user[5], 5000)
+  var PKey = getPKey(PBK, user[1])
+  var GKey = getGKey(PKey, user[2], user[0])
   sendData(data, 'add')
 }
 

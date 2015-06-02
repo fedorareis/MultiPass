@@ -18,3 +18,7 @@ table {
 	width: 100%;
 	text-align: center;
 }
+
+#note {
+	color: red;
+}

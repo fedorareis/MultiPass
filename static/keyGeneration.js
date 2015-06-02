@@ -8,8 +8,10 @@ function generateKeyPair(password){
 	var serialPubKey = sjcl.codec.base64.fromBits(publicKey.x.concat(publicKey.y))
 	var serialPrivateKey = sjcl.codec.base64.fromBits(privateKey)
 	var rand = sjcl.random.randomWords(3, 10);
-	var PBK = sjcl.misc.pbkdf2(password, rand, 5000)
-	console.log(serialPrivateKey)
+	console.log(rand)
+	var iteration = {iter: 5000, salt: rand, length: 128};
+	var PBK = sjcl.misc.cachedPbkdf2(password, iteration)
+	console.log(PBK)
 	privateKey = securePKey(PBK, serialPrivateKey)
 
 	return [privateKey, serialPubKey, rand]
@@ -21,7 +23,7 @@ function securePKey(password, pKey){
 
 function secureGKey(pubKey, gKey){
 	var pub = new sjcl.ecc.elGamal.publicKey(sjcl.ecc.curves.c256, sjcl.codec.base64.toBits(pubKey))
-	return sjcl.encrypt(pub, gKey, {mode: "gcm"})
+	return sjcl.encrypt(pub, sjcl.codec.base64.fromBits(gKey), {mode: "gcm"})
 }
 
 function securePass(gKey, pass){
@@ -34,7 +36,7 @@ function getPKey(password, cyphertext){
 
 function getGKey(pKey, cyphertext){
 	var sec = new sjcl.ecc.elGamal.secretKey(sjcl.ecc.curves.c256, sjcl.ecc.curves.c256.field.fromBits(sjcl.codec.base64.toBits(pKey)))
-	return sjcl.decrypt(sec, cyphertext)
+	return sjcl.codec.base64.toBits(sjcl.decrypt(sec, cyphertext))
 }
 
 function getPass(gKey, cyphertext){
@@ -59,7 +61,7 @@ function shareGKey(pKey, pubKey, gKey){
 }
 
 function generateGKey(pubKey){
-	var rand = sjcl.codec.base64.fromBits(sjcl.random.randomWords(8, 10))
+	var rand = sjcl.random.randomWords(8, 10)
 	return secureGKey(pubKey, rand)
 }
 
