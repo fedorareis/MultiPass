@@ -75,7 +75,6 @@ def add_pass():
         cur = g.db.execute('SELECT ID FROM type WHERE name = ?',
                            [request.form["type"]])
         pType = cur.fetchone()
-        print pType
         g.db.execute('INSERT INTO pswds VALUES (?, ?, ?, ?, ?, ?, ?)',
                      [num, request.form["name"], request.form["domain"],
                      request.form["pass"], request.form["group"],
@@ -161,7 +160,6 @@ def get_salt():
             cur = g.db.execute('SELECT pvKey, gKey, salt FROM users WHERE name = ? ORDER BY passGroup ASC',
                                [request.form['username']])
             data = cur.fetchall()
-            print data
             return json.dumps({'salt': salt[0], 'data': data})
         else:
             error = {'error': 'Invalid username'}
@@ -249,7 +247,6 @@ def register():
                          request.form["pubKey"], num, request.form["gKey"],
                          request.form["kSalt"]])
             g.db.commit()
-            print request.form["key"]
             # Array of all the group keys for the user
             groups = request.form["key"].split(",")
             # A temp array to store the numeric versions of the key values in.
