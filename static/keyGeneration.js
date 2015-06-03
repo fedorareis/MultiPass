@@ -8,11 +8,11 @@ function generateKeyPair(password){
 	var serialPubKey = sjcl.codec.base64.fromBits(publicKey.x.concat(publicKey.y))
 	var serialPrivateKey = sjcl.codec.base64.fromBits(privateKey)
 	var rand = sjcl.random.randomWords(3, 10);
-	console.log(rand)
-	var iteration = {iter: 5000, salt: rand, length: 128};
-	var PBK = sjcl.misc.cachedPbkdf2(password, iteration)
-	console.log(PBK)
+	var PBK = sjcl.misc.pbkdf2(password, rand, 5000)
+	console.log(serialPrivateKey)
 	privateKey = securePKey(PBK, serialPrivateKey)
+
+	alert(PBK)
 
 	return [privateKey, serialPubKey, rand]
 }

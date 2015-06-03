@@ -8,6 +8,7 @@ var el = document.getElementById("submit");
 el.addEventListener("click", login, false);
 
 var test
+var test2
 
 // Generates the validation key to see if the user credentials are correct
 function hash(response) {
@@ -24,35 +25,36 @@ function hash(response) {
   data["password"] = sjcl.codec.base64.fromBits(pass.key.concat(pass.salt))
   
   /* 0 = pKey
-     1 = passGroup
-     2 = gKey
-     3 = salt */
-  var log = response["data"][0]
-  test = log
+     1 = gKey
+     2 = salt */
+  var log = response["data"]
+  test2 = response
   var groups = []
-  if(Array.isArray(log[0]))
+  if(log.length > 1)
   {
     log.forEach(function(element) {
-      salt = element[3].split(",")
+      salt = element[2].split(",")
       saltArr = []
       salt.forEach(function(element2) {
         saltArr.push(parseInt(element2))
       }, this);
       iteration = {iter: 5000, salt: saltArr};
       pass = sjcl.misc.cachedPbkdf2(document.forms["Form"].elements["password"].value, iteration);
-      groups.push(getGKey(getPKey(pass, log[0]), log[2]))
+      groups.push(getGKey(getPKey(pass.key, element[0]), element[1]))
     }, this);
   } else {
-    salt = log[3].split(",")
+    log = log[0]
+    salt = log[2].split(",")
     saltArr = []
     salt.forEach(function(element) {
       saltArr.push(parseInt(element))
     }, this);
     iteration = {iter: 5000, salt: saltArr};
     pass = sjcl.misc.cachedPbkdf2(document.forms["Form"].elements["password"].value, iteration);
-    groups.push(getGKey(getPKey(pass, log[0]), log[2]))
+    groups.push(getGKey(getPKey(pass.key, log[0]), log[1]))
   }
   data["groups"] = groups
+  test = data
   sendData(data, 'login')
 }
 
@@ -87,7 +89,6 @@ function getData(data, page) {
           document.getElementById("error").style.display = "inline"
           document.getElementById("error_msg").textContent = "Error: " + temp["error"]
         } else {
-          console.log(temp)
           hash(temp);
         }
     }

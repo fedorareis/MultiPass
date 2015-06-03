@@ -1,34 +1,26 @@
-function getUser() {
+function getKey() {
   if (document.forms["Form"].elements["name"].value != "" &&
       document.forms["Form"].elements["password"].value != ""){
       var data = {};
       var temp = document.forms["Form"].elements["group"]
-      var group = temp.options[temp.selectedIndex].value
-      data["group"] = group;
+      data["group"] = temp.options[temp.selectedIndex].value
       getData(data, 'add/get');
   }
 }
 
 var el = document.getElementById("add");
-el.addEventListener("click", getUser, false);
+el.addEventListener("click", getKey, false);
 
-function add(user) {
+function add(key) {
   var data = {}
-  var temp = document.forms["Form"].elements["username"]
-  var username = temp.options[temp.selectedIndex].value
-  temp = document.forms["Form"].elements["group"]
-  var group = temp.options[temp.selectedIndex].value
-  data["username"] = username
-  data["group"] = group
-  /* 0 = Name
-     1 = Private Key
-     2 = Public Key 
-     3 = Group
-     4 = Group Key
-     5 = Salt */
-  var PBK = sjcl.misc.pbkdf2(document.forms["Form"].elements["password"].value, user[5], 5000)
-  var PKey = getPKey(PBK, user[1])
-  var GKey = getGKey(PKey, user[2], user[0])
+  var temp = document.forms["Form"].elements["group"]
+  data["group"] = temp.options[temp.selectedIndex].value
+  data["name"] = securePass(key, document.forms["Form"].elements["name"].value)
+  data["domain"] = securePass(key, document.forms["Form"].elements["domain"].value)
+  data["pass"] = securePass(key, document.forms["Form"].elements["password"].value)
+  temp = document.forms["Form"].elements["type"]
+  data["type"] = temp.options[temp.selectedIndex].value
+  data["note"] = securePass(key, document.forms["Form"].elements["note"].value)
   sendData(data, 'add')
 }
 
