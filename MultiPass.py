@@ -29,6 +29,8 @@ def teardown_request(exception):
         
 @app.route("/")
 def home():
+    if session.get('logged_in'):
+        return redirect(url_for('display_pass'))
     return render_template('home.html')
     
 @app.route("/passwords")
@@ -55,7 +57,8 @@ def display_pass():
             edit[length][3] = pTypes[edit[length][3]]
         temp = tuple(tuple(i) for i in edit)
         pswds += temp
-    return render_template('show_passwords.html', pswds=pswds)
+        num = len(pswds) + 1
+    return render_template('show_passwords.html', pswds=json.dumps(pswds), keys=json.dumps(session["group"]), count=num)
 
 @app.route('/add', methods=['GET', 'POST'])
 def add_pass():
@@ -101,6 +104,8 @@ def get_user():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if session.get('logged_in'):
+        return redirect(url_for('display_pass'))
     error = None
     if request.method == 'POST':
         cur = g.db.execute('SELECT pass FROM login WHERE email = ?',
@@ -217,6 +222,8 @@ def transfer():
     
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    if session.get('logged_in'):
+        return redirect(url_for('display_pass'))
     error = None
     if request.method == 'POST':
         cur = g.db.execute('SELECT * FROM login WHERE email = ?',

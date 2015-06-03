@@ -87,7 +87,7 @@ function getData(data, page) {
         var temp = JSON.parse(XHR.responseText)
         if(temp["error"] != null){
           document.getElementById("error").style.display = "inline"
-          document.getElementById("error_msg").textContent = "Error: " + temp["error"]
+          document.getElementById("error").textContent = "Error: " + temp["error"]
         } else {
           hash(temp);
         }
@@ -135,7 +135,7 @@ function sendData(data, page) {
         //alert(XHR.response["error"])
         try {
           document.getElementById("error").style.display = "inline"
-          document.getElementById("error_msg").textContent = "Error: " + JSON.parse(XHR.responseText)["error"]
+          document.getElementById("error").textContent = "Error: " + JSON.parse(XHR.responseText)["error"]
         } catch (error) {
           window.location.href = 'http://127.0.0.1:5000' + XHR.responseText;
         }

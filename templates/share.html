@@ -1,36 +1,39 @@
 {% extends "layout.html" %}
 {% block body %}
-   <form action="{{ url_for('share') }}" method=post id="Form">
-      <dl>
-         <dt>User to share with:</dt>
-         <dd>
-            <select name=username>
-   			 	{% for user in users %}
-                  {% for username in user %}
-   			 		   <option value="{{username}}">{{username}}</option>
-                  {% endfor %}
-   				{% endfor %}
-		 	  </select>
-         </dd>
-         <dt>Password Group to share:</dt>
-         <dd>
-            <select name=group>
-   			 	{% for group in groups %}
-                  {% for name in group %}
-   			 		   <option value="{{name}}">{{name}}</option>
-                  {% endfor %}
-   				{% endfor %}
-            </select>
-         </dd>
-         <dt>Password:</dt>
-         <dd>
-            <input type="password" name="password">
-         </dd>
-      </dl>
-   </form>
-   <button id="share">share</button>
-   <p id="note">Note: Shared groups will not be visible to the other user until next time they log in.</p>
-   
+<div class="container">
+	<div class="box">
+      <form action="{{ url_for('share') }}" method=post id="Form">
+         <dl>
+            <dt>User to share with:</dt>
+            <dd>
+               <select name=username>
+      			 	{% for user in users %}
+                     {% for username in user %}
+      			 		   <option value="{{username}}">{{username}}</option>
+                     {% endfor %}
+      				{% endfor %}
+   		 	  </select>
+            </dd>
+            <dt>Password Group to share:</dt>
+            <dd>
+               <select name=group>
+      			 	{% for group in groups %}
+                     {% for name in group %}
+      			 		   <option value="{{name}}">{{name}}</option>
+                     {% endfor %}
+      				{% endfor %}
+               </select>
+            </dd>
+            <dt>Password:</dt>
+            <dd>
+               <input type="password" name="password">
+            </dd>
+         </dl>
+      </form>
+      <button id="share">share</button>
+      <p id="warning">Note: Shared groups will not be visible to the other user until next time they log in.</p>
+   </div>
+</div>
 <script type="text/javascript" src="{{ url_for('static', filename='share.js') }}"></script>
 <script type="text/javascript">
         setSalt({{salt|safe}});
