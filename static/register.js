@@ -18,6 +18,9 @@ function register() {
                   data["pubKey"] = temp[1];
                   data["kSalt"] = temp[2];
                   data["gKey"] = generateGKey(temp[1]);
+                  var iteration = {iter: 5000, salt: temp[2]};
+                  var pass = sjcl.misc.cachedPbkdf2(document.forms["Form"].elements["password"].value, iteration);
+                  data["key"] = getGKey(getPKey(pass.key, temp[0]), data["gKey"])
                   sendData(data, 'register');
             }
       }

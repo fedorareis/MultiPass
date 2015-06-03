@@ -7,9 +7,6 @@ function login() {
 var el = document.getElementById("submit");
 el.addEventListener("click", login, false);
 
-var test
-var test2
-
 // Generates the validation key to see if the user credentials are correct
 function hash(response) {
   var salt = response["salt"]
@@ -28,7 +25,6 @@ function hash(response) {
      1 = gKey
      2 = salt */
   var log = response["data"]
-  test2 = response
   var groups = []
   if(log.length > 1)
   {
@@ -54,7 +50,6 @@ function hash(response) {
     groups.push(getGKey(getPKey(pass.key, log[0]), log[1]))
   }
   data["groups"] = groups
-  test = data
   sendData(data, 'login')
 }
 

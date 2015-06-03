@@ -249,6 +249,28 @@ def register():
                          request.form["pubKey"], num, request.form["gKey"],
                          request.form["kSalt"]])
             g.db.commit()
+            print request.form["key"]
+            # Array of all the group keys for the user
+            groups = request.form["key"].split(",")
+            # A temp array to store the numeric versions of the key values in.
+            temp = []
+            # The number of key values per key
+            count = 8
+            # Map of all the complete keys
+            keys = {}
+            # an actual counter to iterate through the groupNums
+            groupNum = num
+            # Loops through the key values converting them to ints 
+            # then storing them in an array until the full key is 
+            # converted then the key is assigned to the map with its groupNum.
+            for num in groups:
+                temp.append(int(num))
+                count -= 1
+                if not count:
+                    count = 8
+                    keys[groupNum] = temp
+                    temp = []
+            session['group'] = keys
             session['logged_in'] = True
             session['username'] = request.form["email"]
             flash('You were logged in')
