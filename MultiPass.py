@@ -45,10 +45,9 @@ def display_pass():
         pTypes += [pType[0]]
     pswds = []
     for group in groups:
-        cur = g.db.execute('SELECT name, hostDomain, pass, type, note, passGroup FROM pswds WHERE passGroup = ?',
+        cur = g.db.execute('SELECT name, hostDomain, pass, type, note, passGroup FROM pswds WHERE passGroup = ? ORDER BY passGroup ASC',
                            [group[0]])
         temp = cur.fetchall()
-        print temp
         length = len(temp)
         edit = map(list, temp)
         while length > 0:
@@ -63,7 +62,24 @@ def add_pass():
     if not session.get('logged_in'):
         return redirect(url_for('home'))
     if request.method == 'POST':
-        print "POST"
+        cur = g.db.execute('SELECT MAX(ID) FROM pswds')
+        num = cur.fetchone()
+        num = num[0]
+        if(num == None):
+            num = 0
+        else:
+            num += 1
+        cur = g.db.execute('SELECT ID FROM type WHERE name = ?',
+                           [request.form["type"]])
+        pType = cur.fetchone()
+        print pType
+        g.db.execute('INSERT INTO pswds VALUES (?, ?, ?, ?, ?, ?, ?)',
+                     [num, request.form["name"], request.form["domain"],
+                     request.form["pass"], request.form["group"],
+                     pType[0], request.form["note"]])
+        g.db.commit()
+        flash('Password Added')
+        return url_for('display_pass')
     else:
         cur = g.db.execute('SELECT name FROM type')
         types = cur.fetchall()
@@ -80,9 +96,7 @@ def add_pass():
 def get_user():
     if not session.get('logged_in'):
         return redirect(url_for('home'))
-    cur = g.db.execute('SELECT * FROM users WHERE name = ? AND passGroup = ?',
-                       [session['username'], request.form['group']])
-    data = cur.fetchone()
+    data = session['group'][request.form['group']]
     return json.dumps(data)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -96,8 +110,34 @@ def login():
             if request.form['password'] != pswd[0]:
                 error = {'error': 'Invalid password'}
             else:
+                cur = g.db.execute('SELECT passGroup FROM users WHERE name = ? ORDER BY passGroup ASC',
+                               [request.form['username']])
+                # Array of all the passGroups that the user belongs to.
+                groupNum = cur.fetchall()
                 session['logged_in'] = True
                 session['username'] = request.form["username"]
+                # Array of all the group keys for the user
+                groups = request.form["groups"].split(",")
+                # A temp array to store the numeric versions of the key values in.
+                temp = []
+                # The number of key values per key
+                count = 8
+                # Map of all the complete keys
+                keys = {}
+                # an actual counter to iterate through the groupNums
+                counter = 0
+                # Loops through the key values converting them to ints 
+                # then storing them in an array until the full key is 
+                # converted then the key is assigned to the map with its groupNum.
+                for num in groups:
+                    temp.append(int(num))
+                    count -= 1
+                    if not count:
+                        count = 8
+                        keys[groupNum[counter][0]] = temp
+                        counter += 1
+                        temp = []
+                session['group'] = keys
                 flash('You were logged in')
                 return url_for('display_pass')
         else:
@@ -111,9 +151,13 @@ def get_salt():
     if request.method == 'POST':
         cur = g.db.execute('SELECT salt FROM login WHERE email = ?',
                            [request.form['username']])
-        pswd = cur.fetchone()
-        if(pswd != None):
-            return pswd[0]
+        salt = cur.fetchone()
+        if(salt != None):
+            cur = g.db.execute('SELECT pvKey, gKey, salt FROM users WHERE name = ? ORDER BY passGroup ASC',
+                               [request.form['username']])
+            data = cur.fetchall()
+            print data
+            return json.dumps({'salt': salt[0], 'data': data})
         else:
             error = {'error': 'Invalid username'}
             return jsonify(error)
@@ -123,6 +167,7 @@ def get_salt():
 def logout():
     session.pop('logged_in', None)
     session.pop('username', None)
+    #session.pop('group', None)
     flash('You were logged out')
     return redirect(url_for('home'))
     
