@@ -57,7 +57,12 @@
         </a>
       </div>
       <p>
-        The encryption algorithm starts with user registration.
+        When a user creates their account their password is put into a key derivation function in this case PBKDF2 to create their user key. This user key will be regenerated each time 
+        the user logs in. Also during registration a public/private key pair is generated for them. The private key is then encrypted with the user key using AES in GCM mode, the 
+        resulting cyphertext is then stored in the database with the user info. Each time a group is created (one is created by defualt for each user), the group is given a group key. 
+        This key is generated using the Fortuna pseudo-random number generator that is implemented in SJCL. The group key is encrypted for each user in the group with the user's public 
+        key. The encrypted group key and the user's public key are stored in the database with the user's information. Each password for the group is encrypted with the group key using 
+        AES in GCM mode. The encrypted passwords are then stored in a database.
       </p>
 
       <footer class="site-footer">
