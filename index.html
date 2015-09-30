@@ -45,7 +45,8 @@
       </p>
         
       <h2>Technical Details</h2>
-      <p>At the heart of MultiPass is the cryptographic system. As my security professor loves to say, "Never roll your own crypto." With that in mind the cryptographic system was 
+      <p>MultiPass is built using the <a href="flask python 3">Flask</a> Python framework as its backend with its front end having a combination of HTML, CSS, and Javascript.
+        At the heart of MultiPass is the client side cryptographic system. As my security professor loves to say, "Never roll your own crypto." With that in mind the cryptographic system was 
         implemented in Javascript using the <a href="http://bitwiseshiftleft.github.io/sjcl/">Stanford Javascript Crypto Library</a> (SJCL). The details of the the Cryptographic System
         can get a bit hard to follow so I am going to break it into 3 parts: Encryption, Decryption, and Sharing.
       </p>
@@ -64,8 +65,48 @@
         key. The encrypted group key and the user's public key are stored in the database with the user's information. Each password for the group is encrypted with the group key using 
         AES in GCM mode. The encrypted passwords are then stored in a database.
       </p>
+      
+      <h4>Decryption</h4>
+      <div class="photo">
+        <a href="images/Decryption.pdf">
+          <img src="images/Decryption.png">
+        </a>
+      </div>
+      <p>
+        The encrypted private key is pulled from the database and is decrypted with the user key. The private key is then used to decrypt all of the group keys the user has access to.
+        Once a group key is decrypted it will be used to decrypt all of the passwords that were encrypted with that group key.   
+      </p>
+      
+      <h4>Sharing</h4>
+      <div class="photo">
+        <a href="images/Sharing.pdf">
+          <img src="images/Sharing.png">
+        </a>
+      </div>
+      <p>
+        The final big question is how is the group key shared. That is where the public key from the Encryption section comes in. First the private key is decrypted with the user key.
+        Then the group key is decrypted with the user's private key. The public key for the user that the key is being shared with is fetched from the database, then the group key
+        is encrypted using the user's public key and is stored back in the database with the user's data.
+      </p>
+      
+      <h2>Features</h2>
+      <h4>Implemented</h4>
+        <ul>
+          <li>Registration and Login</li>
+          <li>Password Storage</li>
+          <li>Password Sharing</li>
+        </ul>
+      <h4>Future Items</h4>
+        <ul>
+          <li>Audit Log</li>
+          <li>Password Reset</li>
+          <li>Profiles</li>
+          <li>Better Group Management</li>
+          <li>UI Improvement</li>
+        </ul>
 
       <footer class="site-footer">
+        <p>If you have questions, comments, or ideas send me an email at <a href="mailto:FedoraReis@gmail.com?subject=MultiPass">FedoraReis@gmail.com</a></p>
         <span class="site-footer-owner">
           <a href="https://github.com/fedorareis/MultiPass">MultiPass</a> is maintained by <a href="https://github.com/fedorareis">FedoraReis</a>.
         </span>
