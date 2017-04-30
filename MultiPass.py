@@ -33,7 +33,7 @@ def home():
         return redirect(url_for('display_pass'))
     return render_template('home.html')
     
-@app.route("/passwords")
+@app.route("/passwords/")
 def display_pass():
     if not session.get('logged_in'):
         return redirect(url_for('home'))
@@ -60,7 +60,7 @@ def display_pass():
         num = len(pswds) + 1
     return render_template('show_passwords.html', pswds=json.dumps(pswds), keys=json.dumps(session["group"]), count=num)
 
-@app.route('/add', methods=['GET', 'POST'])
+@app.route('/add/', methods=['GET', 'POST'])
 def add_pass():
     if not session.get('logged_in'):
         return redirect(url_for('home'))
@@ -94,14 +94,14 @@ def add_pass():
         flash('New entry was successfully posted')
     	return render_template('add.html', types=types, groups=groups, salt=json.dumps(salt[0]))
 
-@app.route('/add/get', methods=['POST'])
+@app.route('/add/get/', methods=['POST'])
 def get_user():
     if not session.get('logged_in'):
         return redirect(url_for('home'))
     data = session['group'][request.form['group']]
     return json.dumps(data)
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login/', methods=['GET', 'POST'])
 def login():
     if session.get('logged_in'):
         return redirect(url_for('display_pass'))
@@ -149,7 +149,7 @@ def login():
         return jsonify(error)
     return render_template('login.html', error=error)
 
-@app.route('/login/get', methods=['POST'])
+@app.route('/login/get/', methods=['POST'])
 def get_salt():
     error = None
     if request.method == 'POST':
@@ -166,7 +166,7 @@ def get_salt():
             return jsonify(error)
     return render_template('login.html', error=error)
 
-@app.route('/logout')
+@app.route('/logout/')
 def logout():
     session.pop('logged_in', None)
     session.pop('username', None)
@@ -174,7 +174,7 @@ def logout():
     flash('You were logged out')
     return redirect(url_for('home'))
     
-@app.route('/share', methods=['GET', 'POST'])
+@app.route('/share/', methods=['GET', 'POST'])
 def share():
     if not session.get('logged_in'):
         return redirect(url_for('home'))
@@ -203,7 +203,7 @@ def share():
         salt = cur.fetchone()
         return render_template('share.html', users=users, groups=groups, salt=json.dumps(salt[0]))
 
-@app.route('/share/get', methods=['POST'])
+@app.route('/share/get/', methods=['POST'])
 def transfer():
     if not session.get('logged_in'):
         return redirect(url_for('home'))
@@ -218,7 +218,7 @@ def transfer():
     return jsonify(None)
         
     
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register/', methods=['GET', 'POST'])
 def register():
     if session.get('logged_in'):
         return redirect(url_for('display_pass'))
@@ -273,6 +273,3 @@ def register():
             flash('You were logged in')
             return url_for('display_pass')
     return render_template('home.html', error=error)
-    
-if __name__ == '__main__':
-    app.run()
