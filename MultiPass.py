@@ -119,42 +119,31 @@ def login():
     error = None
     if request.method == 'POST':
         cur = g.db.execute('SELECT pass FROM login WHERE email = ?',
-                           [request.form['username']])
+                           [request.json['username']])
         pswd = cur.fetchone()
         if(pswd != None):
-            if request.form['password'] != pswd[0]:
+            if request.json['password'] != pswd[0]:
                 error = {'error': 'Invalid password'}
             else:
                 cur = g.db.execute('SELECT passGroup FROM users WHERE name = ? ORDER BY passGroup ASC',
-                               [request.form['username']])
+                               [request.json['username']])
                 # Array of all the passGroups that the user belongs to.
                 groupNum = cur.fetchall()
                 session['logged_in'] = True
-                session['username'] = request.form["username"]
+                session['username'] = request.json["username"]
                 # Array of all the group keys for the user
-                groups = request.form["groups"].split(",")
-                # A temp array to store the numeric versions of the key values in.
-                temp = []
-                # The number of key values per key
-                count = 8
+                groups = request.json["groups"]
                 # Map of all the complete keys
                 keys = {}
                 # an actual counter to iterate through the groupNums
                 counter = 0
-                # Loops through the key values converting them to ints
-                # then storing them in an array until the full key is
-                # converted then the key is assigned to the map with its groupNum.
-                for num in groups:
-                    temp.append(int(num))
-                    count -= 1
-                    if not count:
-                        count = 8
-                        keys[groupNum[counter][0]] = temp
-                        counter += 1
-                        temp = []
+                # Loops through the keys and assigns them to the map with their groupNum.
+                for group in groups:
+                    keys[groupNum[counter][0]] = group
+                    counter += 1
                 session['group'] = keys
                 flash('You were logged in')
-                return redirect(url_for('display_pass'))
+                return redirect(url_for('display_pass')), 302
         else:
             error = {'error': 'Invalid username'}
         return jsonify(error)
@@ -236,6 +225,7 @@ def register():
         return redirect(url_for('display_pass'))
     error = None
     if request.method == 'POST':
+        # Check if a user is already registered with the email
         cur = g.db.execute('SELECT * FROM login WHERE email = ?',
                            [request.form["email"]])
         check = cur.fetchone()
@@ -243,10 +233,13 @@ def register():
             error = {'error': 'There is already a registered user with that email.'}
             return jsonify(error)
         else:
+            # Add the user to the login table
             g.db.execute('INSERT INTO login VALUES (?, ?, ?, ?, ?)',
                          [request.form["first_name"], request.form["last_name"],
                          request.form["email"], request.form["password"],
                          request.form["salt"]])
+
+            # Assign the user the next available password group
             cur = g.db.execute('SELECT MAX(passGroup) FROM users')
             num = cur.fetchone()
             num = num[0]
@@ -254,6 +247,8 @@ def register():
                 num = 0
             else:
                 num += 1
+
+            # Add user the the users table
             g.db.execute('INSERT INTO users VALUES (?, ?, ?, ?, ?, ?)',
                          [request.form["email"], request.form["pKey"],
                          request.form["pubKey"], num, request.form["gKey"],

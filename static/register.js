@@ -64,7 +64,7 @@ function sendData(data, page) {
   XHR.onreadystatechange = function() { // Call a function when the state changes.
     if (XHR.readyState == 4 && XHR.status == 200) {
       try {
-        document.getElementById('error').style.display = 'inline'
+        document.getElementById('error').style.display = 'inline';
         document.getElementById('error').textContent = 'Error: ' + JSON.parse(XHR.responseText)['error'];
       } catch (error) {
         window.location.href = 'http://127.0.0.1:5000' + XHR.responseText;
