@@ -13,7 +13,7 @@ PASSWORD = 'default'
 # create our little application :)
 app = Flask(__name__)
 app.config.from_object(__name__)
-    
+
 def connect_db():
     return sqlite3.connect(app.config['DATABASE'])
 
@@ -26,20 +26,28 @@ def teardown_request(exception):
     db = getattr(g, 'db', None)
     if db is not None:
         db.close()
-        
+
 @app.route("/")
 def home():
     if session.get('logged_in'):
         return redirect(url_for('display_pass'))
     return render_template('home.html')
-    
+
+
 @app.route("/passwords/")
 def display_pass():
+    """Get the passwords for the user and render the page with them"""
+
+    # Check if the user is logged in, if not send them to the home page
     if not session.get('logged_in'):
         return redirect(url_for('home'))
+
+    # Get the groups for which the user has access
     cur = g.db.execute('SELECT passGroup FROM users WHERE name = ?',
                        [session['username']])
     groups = cur.fetchall()
+
+    # Get all of the types
     cur = g.db.execute('SELECT name FROM type')
     types = cur.fetchall()
     pTypes = []
@@ -47,7 +55,10 @@ def display_pass():
         pTypes += [pType[0]]
     pswds = []
     for group in groups:
-        cur = g.db.execute('SELECT name, hostDomain, pass, type, note, passGroup FROM pswds WHERE passGroup = ? ORDER BY passGroup ASC',
+        cur = g.db.execute("""SELECT name, hostDomain, pass, type, note, passGroup
+                              FROM pswds
+                              WHERE passGroup = ?
+                              ORDER BY passGroup ASC""",
                            [group[0]])
         temp = cur.fetchall()
         length = len(temp)
@@ -92,7 +103,7 @@ def add_pass():
                            [session['username']])
         salt = cur.fetchone()
         flash('New entry was successfully posted')
-    	return render_template('add.html', types=types, groups=groups, salt=json.dumps(salt[0]))
+        return render_template('add.html', types=types, groups=groups, salt=json.dumps(salt[0]))
 
 @app.route('/add/get/', methods=['POST'])
 def get_user():
@@ -130,8 +141,8 @@ def login():
                 keys = {}
                 # an actual counter to iterate through the groupNums
                 counter = 0
-                # Loops through the key values converting them to ints 
-                # then storing them in an array until the full key is 
+                # Loops through the key values converting them to ints
+                # then storing them in an array until the full key is
                 # converted then the key is assigned to the map with its groupNum.
                 for num in groups:
                     temp.append(int(num))
@@ -143,7 +154,7 @@ def login():
                         temp = []
                 session['group'] = keys
                 flash('You were logged in')
-                return url_for('display_pass')
+                return redirect(url_for('display_pass'))
         else:
             error = {'error': 'Invalid username'}
         return jsonify(error)
@@ -153,12 +164,13 @@ def login():
 def get_salt():
     error = None
     if request.method == 'POST':
+        username = request.json['username']
         cur = g.db.execute('SELECT salt FROM login WHERE email = ?',
-                           [request.form['username']])
+                           [username])
         salt = cur.fetchone()
         if(salt != None):
             cur = g.db.execute('SELECT pvKey, gKey, salt FROM users WHERE name = ? ORDER BY passGroup ASC',
-                               [request.form['username']])
+                               [username])
             data = cur.fetchall()
             return json.dumps({'salt': salt[0], 'data': data})
         else:
@@ -173,7 +185,7 @@ def logout():
     #session.pop('group', None)
     flash('You were logged out')
     return redirect(url_for('home'))
-    
+
 @app.route('/share/', methods=['GET', 'POST'])
 def share():
     if not session.get('logged_in'):
@@ -215,9 +227,9 @@ def transfer():
                            [request.form["username"]])
         data += cur.fetchone()
         return json.dumps(data)
-    return jsonify(None)
-        
-    
+    abort(405)
+
+
 @app.route('/register/', methods=['GET', 'POST'])
 def register():
     if session.get('logged_in'):
@@ -257,8 +269,8 @@ def register():
             keys = {}
             # an actual counter to iterate through the groupNums
             groupNum = num
-            # Loops through the key values converting them to ints 
-            # then storing them in an array until the full key is 
+            # Loops through the key values converting them to ints
+            # then storing them in an array until the full key is
             # converted then the key is assigned to the map with its groupNum.
             for num in groups:
                 temp.append(int(num))
@@ -271,5 +283,5 @@ def register():
             session['logged_in'] = True
             session['username'] = request.form["email"]
             flash('You were logged in')
-            return url_for('display_pass')
-    return render_template('home.html', error=error)
+            return redirect(url_for('display_pass'))
+    abort(405)
