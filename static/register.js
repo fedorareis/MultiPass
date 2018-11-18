@@ -2,6 +2,7 @@
  *
  */
 function register() {
+  // While the form already checks that the fields are filled, that can easily be tampered with.
   if (document.forms['Form'].elements['password'].value != '' &&
       document.forms['Form'].elements['first_name'].value != '' &&
       document.forms['Form'].elements['last_name'].value != '' &&
