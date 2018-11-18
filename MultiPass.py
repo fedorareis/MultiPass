@@ -227,7 +227,7 @@ def register():
     if request.method == 'POST':
         # Check if a user is already registered with the email
         cur = g.db.execute('SELECT * FROM login WHERE email = ?',
-                           [request.form["email"]])
+                           [request.json["email"]])
         check = cur.fetchone()
         if(check != None):
             error = {'error': 'There is already a registered user with that email.'}
@@ -235,9 +235,9 @@ def register():
         else:
             # Add the user to the login table
             g.db.execute('INSERT INTO login VALUES (?, ?, ?, ?, ?)',
-                         [request.form["first_name"], request.form["last_name"],
-                         request.form["email"], request.form["password"],
-                         request.form["salt"]])
+                         [request.json["first_name"], request.json["last_name"],
+                         request.json["email"], request.json["password"],
+                         request.json["salt"]])
 
             # Assign the user the next available password group
             cur = g.db.execute('SELECT MAX(passGroup) FROM users')
@@ -250,12 +250,12 @@ def register():
 
             # Add user the the users table
             g.db.execute('INSERT INTO users VALUES (?, ?, ?, ?, ?, ?)',
-                         [request.form["email"], request.form["pKey"],
-                         request.form["pubKey"], num, request.form["gKey"],
-                         request.form["kSalt"]])
+                         [request.json["email"], request.json["pKey"],
+                         request.json["pubKey"], num, request.json["gKey"],
+                         request.json["kSalt"]])
             g.db.commit()
             # Array of all the group keys for the user
-            groups = request.form["key"].split(",")
+            groups = request.json["key"].split(",")
             # A temp array to store the numeric versions of the key values in.
             temp = []
             # The number of key values per key
@@ -276,7 +276,7 @@ def register():
                     temp = []
             session['group'] = keys
             session['logged_in'] = True
-            session['username'] = request.form["email"]
+            session['username'] = request.json["email"]
             flash('You were logged in')
             return redirect(url_for('display_pass'))
     abort(405)
