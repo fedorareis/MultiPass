@@ -61,15 +61,16 @@ def display_pass():
                               WHERE passGroup = ?
                               ORDER BY passGroup ASC""",
                            [group[0]])
-        temp = cur.fetchall()
-        length = len(temp)
-        edit = map(list, temp)
+        edit = cur.fetchall()
+        length = len(edit)
         while length > 0:
             length -= 1
-            edit[length][3] = pTypes[edit[length][3]]
+            accType = edit[length][3]
+            if(accType != None):
+                edit[length][3] = pTypes[accType]
         temp = tuple(tuple(i) for i in edit)
         pswds += temp
-        num = len(pswds) + 1
+        num = len(pswds)
     return render_template('show_passwords.html', pswds=json.dumps(pswds), keys=json.dumps(session["group"]), count=num)
 
 @app.route('/add/', methods=['GET', 'POST'])
@@ -85,12 +86,14 @@ def add_pass():
         else:
             num += 1
         cur = g.db.execute('SELECT ID FROM type WHERE name = ?',
-                           [request.form["type"]])
+                           [request.json["type"]])
         pType = cur.fetchone()
+        if(pType != None):
+            pType = pType[0]
         g.db.execute('INSERT INTO pswds VALUES (?, ?, ?, ?, ?, ?, ?)',
-                     [num, request.form["name"], request.form["domain"],
-                     request.form["pass"], request.form["group"],
-                     pType[0], request.form["note"]])
+                     [num, request.json["name"], request.json["domain"],
+                     request.json["pass"], request.json["group"],
+                     pType, request.json["note"]])
         g.db.commit()
         flash('Password Added')
         return url_for('display_pass')
@@ -110,7 +113,7 @@ def add_pass():
 def get_user():
     if not session.get('logged_in'):
         return redirect(url_for('home'))
-    groupKey = session['group'][request.form['group']]
+    groupKey = session['group'][request.json['group']]
     return json.dumps(groupKey)
 
 @app.route('/login/', methods=['GET', 'POST'])
