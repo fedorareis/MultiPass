@@ -185,14 +185,14 @@ def share():
         return redirect(url_for('home'))
     if request.method == 'POST':
         cur = g.db.execute('SELECT passGroup FROM users WHERE name = ?',
-                           [request.form["username"]])
+                           [request.json["username"]])
         groups = cur.fetchone()
         cur = g.db.execute('SELECT pvKey, pubKey, salt FROM users WHERE passGroup = ?',
                            [groups[0]])
         data = cur.fetchone()
         g.db.execute('INSERT INTO users VALUES (?, ?, ?, ?, ?, ?)',
-                     [request.form["username"], data[0], data[1],
-                      request.form["group"], request.form["GKey"],
+                     [request.json["username"], data[0], data[1],
+                      request.json["group"], request.json["GKey"],
                       data[2]])
         g.db.commit()
         return url_for('display_pass')
@@ -214,10 +214,10 @@ def transfer():
         return redirect(url_for('home'))
     if request.method == 'POST':
         cur = g.db.execute('SELECT gKey, pvKey FROM users WHERE name = ? AND passGroup = ?',
-                           [session['username'], request.form["group"]])
+                           [session['username'], request.json["group"]])
         data = cur.fetchone()
         cur = g.db.execute('SELECT pubKey FROM users WHERE name = ?',
-                           [request.form["username"]])
+                           [request.json["username"]])
         data += cur.fetchone()
         return json.dumps(data)
     abort(405)
