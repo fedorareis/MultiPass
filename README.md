@@ -6,5 +6,3 @@ The basic idea behind this project is that users can share groups of passwords w
 Currently only basic functionality exists: a user can view, add, and share passwords. Hopefully in the near future I will get a chance to implement some of the other features I have been thinking of.
 
 More information at [http://fedorareis.github.io/MultiPass/](http://fedorareis.github.io/MultiPass/)
-
-Copyright 2015 Kyle Reis
