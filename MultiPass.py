@@ -13,6 +13,7 @@ PASSWORD = 'default'
 # create our little application :)
 app = Flask(__name__)
 app.config.from_object(__name__)
+app.secret_key = SECRET_KEY
 
 def connect_db():
     return sqlite3.connect(app.config['DATABASE'])
@@ -109,8 +110,8 @@ def add_pass():
 def get_user():
     if not session.get('logged_in'):
         return redirect(url_for('home'))
-    data = session['group'][request.form['group']]
-    return json.dumps(data)
+    groupKey = session['group'][request.form['group']]
+    return json.dumps(groupKey)
 
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
@@ -237,7 +238,7 @@ def register():
             g.db.execute('INSERT INTO login VALUES (?, ?, ?, ?, ?)',
                          [request.json["first_name"], request.json["last_name"],
                          request.json["email"], request.json["password"],
-                         request.json["salt"]])
+                         str(request.json["salt"])])
 
             # Assign the user the next available password group
             cur = g.db.execute('SELECT MAX(passGroup) FROM users')
@@ -252,31 +253,12 @@ def register():
             g.db.execute('INSERT INTO users VALUES (?, ?, ?, ?, ?, ?)',
                          [request.json["email"], request.json["pKey"],
                          request.json["pubKey"], num, request.json["gKey"],
-                         request.json["kSalt"]])
+                         str(request.json["salt"])])
             g.db.commit()
-            # Array of all the group keys for the user
-            groups = request.json["key"].split(",")
-            # A temp array to store the numeric versions of the key values in.
-            temp = []
-            # The number of key values per key
-            count = 8
-            # Map of all the complete keys
-            keys = {}
             # an actual counter to iterate through the groupNums
             groupNum = num
-            # Loops through the key values converting them to ints
-            # then storing them in an array until the full key is
-            # converted then the key is assigned to the map with its groupNum.
-            for num in groups:
-                temp.append(int(num))
-                count -= 1
-                if not count:
-                    count = 8
-                    keys[groupNum] = temp
-                    temp = []
-            session['group'] = keys
+            session['group'] = {groupNum: request.json["key"]}
             session['logged_in'] = True
             session['username'] = request.json["email"]
-            flash('You were logged in')
             return redirect(url_for('display_pass'))
     abort(405)

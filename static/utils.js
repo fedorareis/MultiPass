@@ -17,20 +17,23 @@ function sendData(data, page, callback = null) {
 
   XHR.onreadystatechange = function() { // Call a function when the state changes.
     if (XHR.readyState == 4 && XHR.status == 200) {
+      let response;
+      // If there isn't response data it was a redirect
       try {
-        const response = JSON.parse(XHR.responseText);
-        if (response['error'] != null) {
-          document.getElementById('error').style.display = 'inline';
-          document.getElementById('error').textContent = 'Error: ' + response['error'];
-        } else {
-          if (callback) {
-            callback(response);
-          } else {
-            window.location.replace(XHR.responseURL);
-          }
-        }
+        response = JSON.parse(XHR.responseText);
       } catch (error) {
         window.location.replace(XHR.responseURL);
+      }
+
+      if (response && response['error'] != null) {
+        document.getElementById('error').style.display = 'inline';
+        document.getElementById('error').textContent = 'Error: ' + response['error'];
+      } else {
+        if (callback) {
+          return callback(response);
+        } else {
+          return window.location.replace(XHR.responseURL);
+        }
       }
     }
   };
