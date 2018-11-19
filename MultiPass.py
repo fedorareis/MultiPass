@@ -21,6 +21,7 @@ def connect_db():
 @app.before_request
 def before_request():
     g.db = connect_db()
+    # TODO: setup a row_factory to return data as a json object
 
 @app.teardown_request
 def teardown_request(exception):
@@ -43,34 +44,15 @@ def display_pass():
     if not session.get('logged_in'):
         return redirect(url_for('home'))
 
-    # Get the groups for which the user has access
-    cur = g.db.execute('SELECT passGroup FROM users WHERE name = ?',
-                       [session['username']])
-    groups = cur.fetchall()
-
-    # Get all of the types
-    cur = g.db.execute('SELECT name FROM type')
-    types = cur.fetchall()
-    pTypes = []
-    for pType in types:
-        pTypes += [pType[0]]
-    pswds = []
-    for group in groups:
-        cur = g.db.execute("""SELECT name, hostDomain, pass, type, note, passGroup
-                              FROM pswds
-                              WHERE passGroup = ?
-                              ORDER BY passGroup ASC""",
-                           [group[0]])
-        edit = cur.fetchall()
-        length = len(edit)
-        while length > 0:
-            length -= 1
-            accType = edit[length][3]
-            if(accType != None):
-                edit[length][3] = pTypes[accType]
-        temp = tuple(tuple(i) for i in edit)
-        pswds += temp
-        num = len(pswds)
+    cur = g.db.execute("""SELECT p.`name`, p.`hostDomain`, p.`pass`, t.`name`, p.`note`, p.`passGroup`
+                          FROM `pswds` AS p
+                          LEFT JOIN `type` t ON t.`ID` = p.`type`
+                          INNER JOIN `users` u ON u.`passGroup` = p.`passGroup`
+                          WHERE u.`name` = ?
+                          ORDER BY p.`passGroup` ASC""",
+                        [session['username']])
+    pswds = cur.fetchall()
+    num = len(pswds)
     return render_template('show_passwords.html', pswds=json.dumps(pswds), keys=json.dumps(session["group"]), count=num)
 
 @app.route('/add/', methods=['GET', 'POST'])
