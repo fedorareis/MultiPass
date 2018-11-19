@@ -1,45 +1,50 @@
 {% extends "layout.html" %}
 {% block body %}
-<div class="container">
-	<div class="box-add">
-		<form action="{{ url_for('add_pass') }}" method=post id="Form">
-		  <dl>
-		  	<dt>Name:
-			<dd><input type=text name=name>
-			<dt>Domain:
-			<dd><input type=text name=domain>
-			<dt>Password:
-			<dd><input type=text name=password>
-			<dt>Password Group:</dt>
-			<dd>
-				<select name=group>
-				 	{% for group in groups %}
-			          {% for name in group %}
-				   		<option value="{{name}}">{{name}}</option>
-			          {% endfor %}
-					{% endfor %}
-			    </select>
-			</dd>
-			<dt>Type:</dt>
-			<dd>
-			    <select name=type>
-				 	{% for type in types %}
-			          {% for name in type %}
-						<option value="{{name}}">{{name}}</option>
-			          {% endfor %}
-					{% endfor %}
-				</select>
-			</dd>
-			<dt>Note:
-	        <dd>
-				<textarea name=note rows=5 cols=40></textarea>
-			</dd>
-		  </dl>
-		</form>
-	   	<button id="add">add</button>
+<div class="col-sm-4">
+	<div class="card" id="add-card">
+		<h5 class="card-header">Add Password</h5>
+		<div class="card-body">
+			<form id="addForm">
+				<div class="form-group">
+					<label>Name:</label>
+					<input class="form-control" type=text name=name required>
+				</div>
+				<div class="form-group">
+					<label>Domain:</label>
+					<input class="form-control" type=text name=domain required>
+				</div>
+				<div class="form-group">
+					<label>Password:</label>
+					<input class="form-control" type=text name=password required>
+				</div>
+				<div class="form-group">
+					<label>Password Group:</label>
+					<select class="form-control" name=group required>
+						{% for group in groups %}
+						{% for name in group %}
+							<option value="{{name}}">{{name}}</option>
+						{% endfor %}
+						{% endfor %}
+					</select>
+				</div>
+				<div class="form-group">
+					<label>Type:</label>
+					<select class="form-control" name=type>
+						{% for type in types %}
+						{% for name in type %}
+							<option value="{{name}}">{{name}}</option>
+						{% endfor %}
+						{% endfor %}
+					</select>
+				</div>
+				<div class="form-group">
+					<label>Note:</label>
+					<textarea class="form-control" name=note rows=5 cols=40></textarea>
+				</div>
+				<button class="btn btn-primary" type="submit" id="add">Add</button>
+			</form>
+		</div>
 	</div>
 </div>
-<script type="text/javascript" src="{{ url_for('static', filename='sjcl.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='keyGeneration.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='add.js') }}"></script>
 {% endblock %}

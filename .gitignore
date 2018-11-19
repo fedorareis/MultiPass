@@ -1,3 +1,4 @@
 *.db
 *.bac
 *.pyc
+multipass-venv/

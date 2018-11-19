@@ -17,6 +17,6 @@ remove(con)
 insertUser(con)
 
 c.execute("SELECT * FROM users")
-print c.fetchone()
+print(c.fetchone())
 con.close()
 

@@ -1,21 +1,25 @@
 {% extends "layout.html" %}
 {% block body %}
 
-<div class="container">
-	<div class="box">
-      <h2>Login</h2>
-      <p id="error" style="display: none;"></p>
-      <form action="{{ url_for('login') }}" method=post id="Form">
-         <dl>
-            <dt>Username:
-            <dd><input type=text name=username>
-            <dt>Password:
-            <dd><input type=password name=password>
-         </dl>
-      </form>
-      <button id="submit">submit</button>
+<div class="col-sm-4">
+	<div class="card" id="login-card">
+		<h5 class="card-header">Login</h5>
+		<div class="card-body">
+         <p id="error" style="display: none;"></p>
+         <form id="LoginForm">
+				<div class="form-group">
+               <label for="loginUsername">Username</label>
+               <input id="loginUsername" class="form-control" type="email" class="form-control" placeholder="name@example.com" name="username" required>
+            </div>
+				<div class="form-group">
+               <label for="loginPassword">Password</label>
+               <input id="loginPassword" class="form-control" type="password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary" id="submit">Submit</button>
+         </form>
+      </div>
    </div>
 </div>
-   
+
 <script type="text/javascript" src="{{ url_for('static', filename='login.js') }}"></script>
 {% endblock %}

@@ -1,24 +1,26 @@
-var test
-var test2
-var num
+/**
+ * Fills the table with the decrypted data
+ *
+ * @param {array} pswds Array of encrypted data for the row
+ * @param {array} keys Array of the group keys
+ */
+function decrypt(pswds, keys) {
+  // For each row populate it's columns
+  pswds.forEach((rowData, rowIndex) => {
+    let row = document.getElementById(rowIndex);
+    row = row.getElementsByTagName('td');
 
-function decrypt(pswds, keys, count){
-	test = pswds
-	test2 = keys
-	num = count
-	var temp
-	for(i = 1; i < count; i++){
-		temp = document.getElementById(i)
-		temp = temp.getElementsByTagName('td')
-		for(j = 0; j <= 5; j++){
-			if(j == 3 || j == 5){
-				var text = document.createTextNode(pswds[i-1][j])
-				temp[j].appendChild(text)
-			} else {
-				var data = getPass(keys[pswds[i-1][5]], pswds[i-1][j])
-				var text = document.createTextNode(data)
-				temp[j].appendChild(text)
-			}
-		}
-	}
+    // For each column decrypt the data and place it in the column
+    rowData.forEach((colData, colIndex) => {
+      // Group and type don't need to be decrypted
+      if (colIndex == 3 || colIndex == 5) {
+        const text = document.createTextNode(colData);
+        row[colIndex].appendChild(text);
+      } else {
+        const data = getPass(keys[rowData[5]], colData);
+        const text = document.createTextNode(data);
+        row[colIndex].appendChild(text);
+      }
+    });
+  });
 }
