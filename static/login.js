@@ -34,10 +34,10 @@ function hash(response) {
   /* 0 = pKey
      1 = gKey
      2 = salt */
-  const log = response['data'];
+  const keys = response['data'];
   const groups = [];
-  log.forEach((element) => {
-    groups.push(getGKey(getPKey(pass.key, element[0]), element[1]));
+  keys.forEach((key) => {
+    groups.push(getGKey(getPKey(pass.key, key[0]), key[1]));
   }, this);
 
   const request = {
