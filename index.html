@@ -36,8 +36,25 @@
         MultiPass
       </h1>
 
+      <h2>Notice</h2>
+      <p>
+        I built the original version of this project in April 2015 as an indapendent study project in college. Since then I have read
+        <a href="https://1passwordstatic.com/files/security/1password-white-paper.pdf">1Password's white paper</a> (which was published later that year)
+        and gained more software dev expierence. I periodically revisit this project, but try to keep to the original core design for how encryption,
+        decryption, and sharing work.
+      </p>
+      <p>
+        While this is licensed as GPLv3, I don't recommend using this for actual passwords. While I am reasonably confident in my security design and I use standard cryptography opperations, this hasn't
+        been tested or reviewed to a level where I feel comfortable recommending using it for real data. If you are looking for a password manager please use a tested password manager such as <a href="https://1password.com">1Password</a>.
+        I have also kept the cryptography design the same as the original to avoid using privileged information from the compnies I have worked at.
+      </p>
+      <p>
+        For legal reasons I feel compelled to note that this is not endoresed by or affiliated with 1Password.
+      </p>
+
       <h2>Background</h2>
-      <p>The idea for MultiPass was sparked by a problem that I had to solve at an internship. 
+      <p>
+        The idea for MultiPass was sparked by a problem that I had to solve at an internship that I had.
         The problem was that they needed a way to securely store their passwords so that all of the technicians in their Information Systems department could access them.
         Beyond secure storage, they also wanted an audit trail for the passwords. They wanted to know who created, accessed, or modified the passwords and when.
         I built an internal solution for the company, but it got me thinking about this problem on a larger scale. There are times where people within companies, clubs, organizations, etc. need acceess
@@ -45,22 +62,24 @@
         A more secure solution would be for everyone to have another password manager that allows the owner of the password to share it with others, but that generally doesn't have support
         for auditing. Out of this problem was born MultiPass.
       </p>
-        
+
       <h2>Development</h2>
-      <p>Development of MultiPass was started by Kyle Reis in March 2015. The development process started with figuring out what features I was looking for in an initial prototype
+      <p>
+        Development of MultiPass was started by Kyle Reis in March 2015. The development process started with figuring out what features I was looking for in an initial prototype
         and deciding on an initial deployment environment. After some brainstorming and research an initial feature set was decided upon and a web deployment was decided upon.
         The next stage was figuring out how I was going to secure all the data yet allow full functionality. After some research and a lot of creative thinking a solution was found
         and a cryptographic system was developed. Once the cryptography was in place, the only thing left to do was set up the database and start building the functionality that was
         needed in the site. During the development process security advice was sought from a Cal Poly security professor.
       </p>
-        
+
       <h2>Technical Details</h2>
-      <p>MultiPass is built using the <a href="flask python 3">Flask</a> Python framework as its backend with its front end having a combination of HTML, CSS, and Javascript.
-        At the heart of MultiPass is the client side cryptographic system. As my security professor loves to say, "Never roll your own crypto." With that in mind the cryptographic system was 
+      <p>
+        MultiPass is built using the <a href="flask python 3">Flask</a> Python framework as its backend with its front end having a combination of HTML, CSS, and Javascript.
+        At the heart of MultiPass is the client side cryptographic system. As my security professor loves to say, "Never roll your own crypto." With that in mind the cryptographic system was
         implemented in Javascript using the <a href="http://bitwiseshiftleft.github.io/sjcl/">Stanford Javascript Crypto Library</a> (SJCL). The details of the the Cryptographic System
         can get a bit hard to follow so I am going to break it into 3 parts: Encryption, Decryption, and Sharing.
       </p>
-      
+
       <h4>Encryption</h4>
       <div class="photo">
         <a href="images/Encryption.pdf">
@@ -68,14 +87,14 @@
         </a>
       </div>
       <p>
-        When a user creates their account their password is put into a key derivation function in this case PBKDF2 to create their user key. This user key will be regenerated each time 
-        the user logs in. Also during registration a public/private key pair is generated for them. The private key is then encrypted with the user key using AES in GCM mode, the 
-        resulting cyphertext is then stored in the database with the user info. Each time a group is created (one is created by defualt for each user), the group is given a group key. 
-        This key is generated using the Fortuna pseudo-random number generator that is implemented in SJCL. The group key is encrypted for each user in the group with the user's public 
-        key. The encrypted group key and the user's public key are stored in the database with the user's information. Each password for the group is encrypted with the group key using 
+        When a user creates their account their password is put into a key derivation function in this case PBKDF2 to create their user key. This user key will be regenerated each time
+        the user logs in. Also during registration a public/private key pair is generated for them. The private key is then encrypted with the user key using AES in GCM mode, the
+        resulting cyphertext is then stored in the database with the user info. Each time a group is created (one is created by defualt for each user), the group is given a group key.
+        This key is generated using the Fortuna pseudo-random number generator that is implemented in SJCL. The group key is encrypted for each user in the group with the user's public
+        key. The encrypted group key and the user's public key are stored in the database with the user's information. Each password for the group is encrypted with the group key using
         AES in GCM mode. The encrypted passwords are then stored in a database.
       </p>
-      
+
       <h4>Decryption</h4>
       <div class="photo">
         <a href="images/Decryption.pdf">
@@ -84,9 +103,9 @@
       </div>
       <p>
         The encrypted private key is pulled from the database and is decrypted with the user key. The private key is then used to decrypt all of the group keys the user has access to.
-        Once a group key is decrypted it will be used to decrypt all of the passwords that were encrypted with that group key.   
+        Once a group key is decrypted it will be used to decrypt all of the passwords that were encrypted with that group key.
       </p>
-      
+
       <h4>Sharing</h4>
       <div class="photo">
         <a href="images/Sharing.pdf">
@@ -98,7 +117,7 @@
         Then the group key is decrypted with the user's private key. The public key for the user that the key is being shared with is fetched from the database, then the group key
         is encrypted using the user's public key and is stored back in the database with the user's data.
       </p>
-      
+
       <h2>Features</h2>
       <h4>Implemented</h4>
         <ul>
