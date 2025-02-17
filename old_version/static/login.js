@@ -27,7 +27,7 @@ function hash(response) {
 
   // Use the salt from the response to get the PBKDF
   const salt = JSON.parse(response['salt']);
-  const iteration = {iter: 5000, salt: salt};
+  const iteration = { iter: 5000, salt: salt };
   const pass = sjcl.misc.cachedPbkdf2(FD.get('password'), iteration);
   const password = sjcl.codec.base64.fromBits(pass.key.concat(pass.salt));
 

@@ -4,8 +4,7 @@
 function getKey() {
   const form = document.getElementById('addForm');
   const FD = new FormData(form);
-  if (FD.get('name') != '' &&
-    FD.get('password') != '') {
+  if (FD.get('name') != '' && FD.get('password') != '') {
     const request = {
       group: FD.get('group'),
     };

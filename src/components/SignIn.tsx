@@ -1,10 +1,10 @@
-'use client'
-import { useState } from 'react'
-import Input from './Input'
-import { KeyIcon } from '@heroicons/react/24/outline'
+'use client';
+import { useState } from 'react';
+import Input from './Input';
+import { KeyIcon } from '@heroicons/react/24/outline';
 
 export default function SignIn() {
-  const [emailError, setEmailError] = useState('')
+  const [emailError, setEmailError] = useState('');
   // const [passwordError, setPasswordError] = useState("");
 
   return (
@@ -29,9 +29,9 @@ export default function SignIn() {
                 error={emailError}
                 onChange={(event) => {
                   if (!event.target.value.includes('@')) {
-                    setEmailError('Please enter a valid email address')
+                    setEmailError('Please enter a valid email address');
                   } else {
-                    setEmailError('')
+                    setEmailError('');
                   }
                 }}
               />
@@ -59,5 +59,5 @@ export default function SignIn() {
         </div>
       </div>
     </>
-  )
+  );
 }

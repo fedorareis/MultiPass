@@ -1,7 +1,7 @@
-import { db } from "../../../../utils/database";
+import { db } from '../../../../utils/database';
 
 async function findTypes() {
-  return await db.selectFrom("types").selectAll().executeTakeFirst();
+  return await db.selectFrom('types').selectAll().executeTakeFirst();
 }
 
 export async function GET() {

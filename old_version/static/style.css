@@ -1,29 +1,30 @@
 a#Home {
-	color: #00997A;
-	text-align: left;
-	text-decoration: none;
+  color: #00997a;
+  text-align: left;
+  text-decoration: none;
 }
 
-#login-card, #register-card {
-	max-width: 25rem;
-	min-width: 25rem;
+#login-card,
+#register-card {
+  max-width: 25rem;
+  min-width: 25rem;
 }
 
 #login {
-	float: right;
+  float: right;
 }
 
 #warning {
-	color: #CC0000;
-	padding-left: 15px;
-	padding-right: 15px;
+  color: #cc0000;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 
 #error {
-	color: #CC0000;
-	font-size: 10pt;
+  color: #cc0000;
+  font-size: 10pt;
 }
 
 #share_link {
-	margin-left: 10px;
+  margin-left: 10px;
 }

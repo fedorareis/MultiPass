@@ -1,8 +1,8 @@
-import { defineConfig } from "kysely-ctl";
-import { db } from "./utils/database";
-import { FileMigrationProvider, Migrator } from "kysely";
-import * as path from "path";
-import { promises as fs } from "fs";
+import { defineConfig } from 'kysely-ctl';
+import { db } from './utils/database';
+import { FileMigrationProvider, Migrator } from 'kysely';
+import * as path from 'path';
+import { promises as fs } from 'fs';
 
 export default defineConfig({
   // replace me with a real dialect instance OR a dialect name + `dialectConfig` prop.
@@ -14,7 +14,7 @@ export default defineConfig({
         fs,
         path,
         // This needs to be an absolute path.
-        migrationFolder: path.join(__dirname, "utils/migrations"),
+        migrationFolder: path.join(__dirname, 'utils/migrations'),
       }),
     }),
   },

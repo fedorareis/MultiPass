@@ -3,7 +3,7 @@ import { Algorithm, Usage } from "./constants";
 export async function PBKDF2(
   password: string,
   salt: ArrayBuffer | TypedArray | DataView,
-  iterations: Number
+  iterations: Number,
 ) {
   const algorithm = Algorithm.PBKDF2;
   const usages = [
@@ -35,7 +35,7 @@ export async function PBKDF2(
     keyData,
     algorithm,
     false,
-    usages
+    usages,
   );
 
   return window.crypto.subtle.deriveKey(
@@ -43,7 +43,7 @@ export async function PBKDF2(
     baseKey,
     AesKeyGenParams,
     true,
-    usages
+    usages,
   );
 }
 

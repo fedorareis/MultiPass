@@ -14,7 +14,9 @@ function generateKeyPair(password) {
   const publicKey = key.pub.get();
 
   // Converts keys to Base64 for storage
-  const serialPubKey = sjcl.codec.base64.fromBits(publicKey.x.concat(publicKey.y));
+  const serialPubKey = sjcl.codec.base64.fromBits(
+    publicKey.x.concat(publicKey.y),
+  );
   const serialPrivateKey = sjcl.codec.base64.fromBits(privateKey);
   const rand = sjcl.random.randomWords(3, 10);
   const PBK = sjcl.misc.pbkdf2(password, rand, 5000);
@@ -34,7 +36,7 @@ function generateKeyPair(password) {
  * @return {string} The encrypted private key
  */
 function securePKey(password, pKey) {
-  return sjcl.encrypt(password, pKey, {mode: 'gcm'});
+  return sjcl.encrypt(password, pKey, { mode: 'gcm' });
 }
 
 /**
@@ -46,8 +48,11 @@ function securePKey(password, pKey) {
  * @return {string}
  */
 function secureGKey(pubKey, gKey) {
-  const pub = new sjcl.ecc.elGamal.publicKey(sjcl.ecc.curves.c256, sjcl.codec.base64.toBits(pubKey));
-  return sjcl.encrypt(pub, sjcl.codec.base64.fromBits(gKey), {mode: 'gcm'});
+  const pub = new sjcl.ecc.elGamal.publicKey(
+    sjcl.ecc.curves.c256,
+    sjcl.codec.base64.toBits(pubKey),
+  );
+  return sjcl.encrypt(pub, sjcl.codec.base64.fromBits(gKey), { mode: 'gcm' });
 }
 
 /**
@@ -59,7 +64,7 @@ function secureGKey(pubKey, gKey) {
  * @return {string} The encrypted password
  */
 function securePass(gKey, pass) {
-  return sjcl.encrypt(gKey, pass, {mode: 'gcm'});
+  return sjcl.encrypt(gKey, pass, { mode: 'gcm' });
 }
 
 /**
@@ -83,7 +88,10 @@ function getPKey(password, cyphertext) {
  * @return {bitArray} The group key
  */
 function getGKey(pKey, cyphertext) {
-  const sec = new sjcl.ecc.elGamal.secretKey(sjcl.ecc.curves.c256, sjcl.ecc.curves.c256.field.fromBits(sjcl.codec.base64.toBits(pKey)));
+  const sec = new sjcl.ecc.elGamal.secretKey(
+    sjcl.ecc.curves.c256,
+    sjcl.ecc.curves.c256.field.fromBits(sjcl.codec.base64.toBits(pKey)),
+  );
   return sjcl.codec.base64.toBits(sjcl.decrypt(sec, cyphertext));
 }
 

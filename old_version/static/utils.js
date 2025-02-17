@@ -1,4 +1,3 @@
-
 /**
  *
  * @param {object} data The object with the data to get passed to the page.
@@ -11,11 +10,12 @@ function sendData(data, page, callback = null) {
   const request = JSON.stringify(data);
 
   // We define what will happen in case of error
-  XHR.addEventListener('error', function(event) {
+  XHR.addEventListener('error', function (event) {
     console.error('Oups! Something went wrong with the request.');
   });
 
-  XHR.onreadystatechange = function() { // Call a function when the state changes.
+  XHR.onreadystatechange = function () {
+    // Call a function when the state changes.
     if (XHR.readyState == 4 && XHR.status == 200) {
       let response;
       // If there isn't response data it was a redirect
@@ -27,7 +27,8 @@ function sendData(data, page, callback = null) {
 
       if (response && response['error'] != null) {
         document.getElementById('error').style.display = 'inline';
-        document.getElementById('error').textContent = 'Error: ' + response['error'];
+        document.getElementById('error').textContent =
+          'Error: ' + response['error'];
       } else {
         if (callback) {
           return callback(response);

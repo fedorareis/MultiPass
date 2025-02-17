@@ -34,7 +34,7 @@ function getKeyMaterial(password: string) {
     enc.encode(password),
     "PBKDF2",
     false,
-    ["deriveBits", "deriveKey"]
+    ["deriveBits", "deriveKey"],
   );
 }
 
@@ -51,7 +51,7 @@ async function generateUserKey(password: string) {
     keyMaterial,
     { name: "AES-GCM", length: 256 },
     true,
-    ["encrypt", "decrypt"]
+    ["encrypt", "decrypt"],
   );
 
   return [key, salt];

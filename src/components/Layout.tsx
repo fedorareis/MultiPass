@@ -1,20 +1,20 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
+import { useState } from 'react';
 import {
   Dialog,
   DialogBackdrop,
   DialogPanel,
   TransitionChild,
-} from '@headlessui/react'
+} from '@headlessui/react';
 import {
   Bars3Icon,
   HomeIcon,
   XMarkIcon,
   KeyIcon,
-} from '@heroicons/react/24/outline'
+} from '@heroicons/react/24/outline';
 // import { KeyIcon } from '@heroicons/react/24/solid'
-import { classNames } from '../../utils/utils'
+import { classNames } from '../../utils/utils';
 
 const navigation = [
   { name: 'Home', href: '/', icon: HomeIcon, current: true },
@@ -23,10 +23,10 @@ const navigation = [
   //   { name: "Calendar", href: "#", icon: CalendarIcon, current: false },
   //   { name: "Documents", href: "#", icon: DocumentDuplicateIcon, current: false },
   //   { name: "Reports", href: "#", icon: ChartPieIcon, current: false },
-]
+];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <>
@@ -164,5 +164,5 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </main>
       </div>
     </>
-  )
+  );
 }

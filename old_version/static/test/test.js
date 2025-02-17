@@ -19,20 +19,30 @@ function test() {
   const key = sjcl.ecc.elGamal.generateKeys(256);
   const privateKey = key.sec.get();
   const publicKey = key.pub.get();
-  const serialPubKey = sjcl.codec.base64.fromBits(publicKey.x.concat(publicKey.y));
+  const serialPubKey = sjcl.codec.base64.fromBits(
+    publicKey.x.concat(publicKey.y),
+  );
   const serialPrivateKey = sjcl.codec.base64.fromBits(privateKey);
 
   // Recreates the public key from the bitstring after converting it to a bitstring from base64
-  const pub = new sjcl.ecc.elGamal.publicKey(sjcl.ecc.curves.c256, sjcl.codec.base64.toBits(serialPubKey));
+  const pub = new sjcl.ecc.elGamal.publicKey(
+    sjcl.ecc.curves.c256,
+    sjcl.codec.base64.toBits(serialPubKey),
+  );
 
   // Recreates the private key from the bitstring after converting it to a bitstring from base64
-  const sec = new sjcl.ecc.elGamal.secretKey(sjcl.ecc.curves.c256, sjcl.ecc.curves.c256.field.fromBits(sjcl.codec.base64.toBits(serialPrivateKey)));
+  const sec = new sjcl.ecc.elGamal.secretKey(
+    sjcl.ecc.curves.c256,
+    sjcl.ecc.curves.c256.field.fromBits(
+      sjcl.codec.base64.toBits(serialPrivateKey),
+    ),
+  );
 
-  const ciphertext = sjcl.encrypt(pub, 'Hello World', {mode: 'gcm'});
+  const ciphertext = sjcl.encrypt(pub, 'Hello World', { mode: 'gcm' });
   const decrypt = sjcl.decrypt(sec, ciphertext);
 
   // const masterKey = sjcl.misc.cachedPbkdf2(password, 5000)
-  const ciphertextSym = sjcl.encrypt(password, 'Hello World', {mode: 'gcm'});
+  const ciphertextSym = sjcl.encrypt(password, 'Hello World', { mode: 'gcm' });
   const decryptSym = sjcl.decrypt(password, ciphertextSym);
 
   console.log('Password & Key:');

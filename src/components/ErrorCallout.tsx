@@ -1,4 +1,4 @@
-import { XCircleIcon } from "@heroicons/react/20/solid";
+import { XCircleIcon } from '@heroicons/react/20/solid';
 
 export default function ErrorCallout({
   title,
