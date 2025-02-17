@@ -1,27 +1,32 @@
-"use client";
+'use client'
 
-import { useState } from "react";
+import { useState } from 'react'
 import {
   Dialog,
   DialogBackdrop,
   DialogPanel,
   TransitionChild,
-} from "@headlessui/react";
-import { Bars3Icon, HomeIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { classNames } from "../../utils/utils";
-import Image from "next/image";
+} from '@headlessui/react'
+import {
+  Bars3Icon,
+  HomeIcon,
+  XMarkIcon,
+  KeyIcon,
+} from '@heroicons/react/24/outline'
+// import { KeyIcon } from '@heroicons/react/24/solid'
+import { classNames } from '../../utils/utils'
 
 const navigation = [
-  { name: "Home", href: "/", icon: HomeIcon, current: true },
+  { name: 'Home', href: '/', icon: HomeIcon, current: true },
   //   { name: "Team", href: "#", icon: UsersIcon, current: false },
   //   { name: "Projects", href: "#", icon: FolderIcon, current: false },
   //   { name: "Calendar", href: "#", icon: CalendarIcon, current: false },
   //   { name: "Documents", href: "#", icon: DocumentDuplicateIcon, current: false },
   //   { name: "Reports", href: "#", icon: ChartPieIcon, current: false },
-];
+]
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
     <>
@@ -59,13 +64,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               {/* Sidebar component, swap this element with another sidebar if you like */}
               <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-2 ring-1 ring-white/10">
                 <div className="flex h-16 shrink-0 items-center">
-                  <Image
-                    alt="Your Company"
-                    src="https://tailwindui.com/plus/img/logos/mark.svg?color=cyan&shade=500"
-                    width={32}
-                    height={32}
-                    className="h-8 w-auto"
-                  />
+                  <KeyIcon aria-hidden="true" className="h-8 text-cyan-500" />
                 </div>
                 <nav className="flex flex-1 flex-col">
                   <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -77,9 +76,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                               href={item.href}
                               className={classNames(
                                 item.current
-                                  ? "bg-gray-800 text-white"
-                                  : "text-gray-400 hover:bg-gray-800 hover:text-white",
-                                "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
+                                  ? 'bg-gray-800 text-white'
+                                  : 'text-gray-400 hover:bg-gray-800 hover:text-white',
+                                'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold',
                               )}
                             >
                               <item.icon
@@ -104,13 +103,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6">
             <div className="flex h-16 shrink-0 items-center">
-              <Image
-                alt="Your Company"
-                src="https://tailwindui.com/plus/img/logos/mark.svg?color=cyan&shade=500"
-                width={32}
-                height={32}
-                className="h-8 w-auto"
-              />
+              <KeyIcon aria-hidden="true" className="h-8 text-cyan-500" />
             </div>
             <nav className="flex flex-1 flex-col">
               <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -122,15 +115,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                           href={item.href}
                           className={classNames(
                             item.current
-                              ? "bg-gray-800 text-white"
-                              : "text-gray-400 hover:bg-gray-800 hover:text-white",
-                            "group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold"
+                              ? 'bg-gray-800 text-white'
+                              : 'text-gray-400 hover:bg-gray-800 hover:text-white',
+                            'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold',
                           )}
                         >
                           <item.icon
                             aria-hidden="true"
                             className="size-6 shrink-0"
                           />
+
                           {item.name}
                         </a>
                       </li>
@@ -170,5 +164,5 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </main>
       </div>
     </>
-  );
+  )
 }

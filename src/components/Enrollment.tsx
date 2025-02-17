@@ -1,25 +1,19 @@
-"use client";
-import Image from "next/image";
-import Input from "./Input";
-import { useState } from "react";
-import ErrorCallout from "./ErrorCallout";
+'use client'
+import Input from './Input'
+import { useState } from 'react'
+import ErrorCallout from './ErrorCallout'
+import { KeyIcon } from '@heroicons/react/24/outline'
 
 export default function Enrollment() {
-  const [emailError, setEmailError] = useState("");
+  const [emailError, setEmailError] = useState('')
   // const [passwordError, setPasswordError] = useState("");
-  const [submissionError, setSubmissionError] = useState("");
+  const [submissionError, setSubmissionError] = useState('')
 
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <Image
-            alt="Your Company"
-            src="https://tailwindui.com/plus/img/logos/mark.svg?color=cyan&shade=500"
-            width={40}
-            height={40}
-            className="mx-auto h-10 w-auto"
-          />
+          <KeyIcon aria-hidden="true" className="mx-auto h-8 text-cyan-500" />
           <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">
             Register your Account
           </h2>
@@ -36,10 +30,10 @@ export default function Enrollment() {
                 autoComplete="email"
                 error={emailError}
                 onChange={(event) => {
-                  if (!event.target.value.includes("@")) {
-                    setEmailError("Please enter a valid email address");
+                  if (!event.target.value.includes('@')) {
+                    setEmailError('Please enter a valid email address')
                   } else {
-                    setEmailError("");
+                    setEmailError('')
                   }
                 }}
               />
@@ -83,5 +77,5 @@ export default function Enrollment() {
         </div>
       </div>
     </>
-  );
+  )
 }
