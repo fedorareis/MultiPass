@@ -2,10 +2,12 @@
 import Image from "next/image";
 import Input from "./Input";
 import { useState } from "react";
+import ErrorCallout from "./ErrorCallout";
 
 export default function Enrollment() {
   const [emailError, setEmailError] = useState("");
   // const [passwordError, setPasswordError] = useState("");
+  const [submissionError, setSubmissionError] = useState("");
 
   return (
     <>
@@ -61,6 +63,12 @@ export default function Enrollment() {
                 required
                 autoComplete="new-password"
               />
+            </div>
+
+            <div>
+              {submissionError && (
+                <ErrorCallout title="Error">{submissionError}</ErrorCallout>
+              )}
             </div>
 
             <div>
