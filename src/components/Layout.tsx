@@ -27,6 +27,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <SidebarHeader>
             <SidebarSection className="max-lg:hidden">
               <KeyIcon aria-hidden="true" className="h-8 text-cyan-500" />
+              {/* TODO: add theme switcher (currently broken) */}
             </SidebarSection>
           </SidebarHeader>
           <SidebarBody>
