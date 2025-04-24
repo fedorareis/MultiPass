@@ -1,78 +1,81 @@
 'use client';
-import Input from './Input';
+// import Input from './Input';
 import { useState } from 'react';
 import ErrorCallout from './ErrorCallout';
 import { KeyIcon } from '@heroicons/react/24/outline';
+import { Heading } from './Catalyst/heading';
+import { Field, FieldGroup, Fieldset, Label } from './Catalyst/fieldset';
+import { Button } from './Catalyst/button';
+import { Input } from './Catalyst/input';
 
 export default function Enrollment() {
   const [emailError, setEmailError] = useState('');
   // const [passwordError, setPasswordError] = useState("");
   const [submissionError, setSubmissionError] = useState('');
 
+  const onSubmit = async (event) => {};
+
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+        <div className="flex flex-col justify-center gap-3 text-center sm:mx-auto sm:w-full sm:max-w-sm">
           <KeyIcon aria-hidden="true" className="mx-auto h-8 text-cyan-500" />
-          <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">
-            Register your Account
-          </h2>
+          <Heading>Register your Account</Heading>
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form action="#" method="POST" className="space-y-6">
-            <div>
-              <Input
-                name="email"
-                type="email"
-                label="Email address"
-                required
-                autoComplete="email"
-                error={emailError}
-                onChange={(event) => {
-                  if (!event.target.value.includes('@')) {
-                    setEmailError('Please enter a valid email address');
-                  } else {
-                    setEmailError('');
-                  }
-                }}
-              />
-            </div>
+            <Fieldset>
+              <FieldGroup>
+                <Field>
+                  <Label>Email address</Label>
+                  <Input
+                    name="email"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    // error={emailError}
+                    onChange={(event) => {
+                      if (!event.target.value.includes('@')) {
+                        setEmailError('Please enter a valid email address');
+                      } else {
+                        setEmailError('');
+                      }
+                    }}
+                  />
+                </Field>
 
-            <div>
-              <Input
-                name="new-password"
-                type="password"
-                label="New Password"
-                required
-                autoComplete="new-password"
-              />
-            </div>
+                <Field>
+                  <Label>New Password</Label>
+                  <Input
+                    name="new-password"
+                    type="password"
+                    required
+                    autoComplete="new-password"
+                  />
+                </Field>
 
-            <div>
-              <Input
-                name="verify-password"
-                type="password"
-                label="Verify Password"
-                required
-                autoComplete="new-password"
-              />
-            </div>
+                <Field>
+                  <Label>Verify Password</Label>
+                  <Input
+                    name="verify-password"
+                    type="password"
+                    required
+                    autoComplete="new-password"
+                  />
+                </Field>
 
-            <div>
-              {submissionError && (
-                <ErrorCallout title="Error">{submissionError}</ErrorCallout>
-              )}
-            </div>
+                <Field>
+                  {submissionError && (
+                    <ErrorCallout title="Error">{submissionError}</ErrorCallout>
+                  )}
+                </Field>
 
-            <div>
-              <button
-                type="submit"
-                className="flex w-full justify-center rounded-md bg-cyan-500 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-2xs hover:bg-cyan-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-500"
-              >
-                Submit
-              </button>
-            </div>
+                <Button type="submit" color="cyan">
+                  Submit
+                </Button>
+              </FieldGroup>
+            </Fieldset>
           </form>
         </div>
       </div>
